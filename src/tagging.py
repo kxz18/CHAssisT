@@ -3,7 +3,7 @@
 """save messages with corresponding tags and answer questions from users,
    display and cleaning function are also provided"""
 from wechaty import Message, Contact, Room
-from wechaty.plugin import WechatyPlugin
+from plugin import WechatyPlugin
 
 class Tagging(WechatyPlugin):
     """tagging system plugin for bot"""
