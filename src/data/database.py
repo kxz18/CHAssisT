@@ -38,6 +38,12 @@ class PrimaryKey(Field):
         elements.insert(1, "PRIMARY KEY")
         return elements
 
+    @classmethod
+    def id(cls):
+        """use auto incremental int id as primary key"""
+        return PrimaryKey(name="id", dtype="INT",\
+                null=False, others=["AUTOINCREMENT"])
+
 class Database:
     """use sqlite as database"""
     def __init__(self, path):
