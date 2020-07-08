@@ -3,16 +3,26 @@
 """question-answering system"""
 from math import sqrt
 from collections import defaultdict
+from enum import Enum, unique
+
+@unique
+class Confidence(Enum):
+    """confidence enum type"""
+    NO = 0
+    MEDIAN = 1
+    HIGH = 2
 
 class QuestionAnswering:
     """class of QA"""
     def __init__(self, database):
         """database: database of all tagged messages"""
+        # database
         self.database = database
 
     @classmethod
     def get_tags_from_msg(cls, text: str):
         """split text and get tags"""
+        # currently just use whole sentence
         return text
 
     @classmethod
@@ -42,4 +52,12 @@ class QuestionAnswering:
 
     def cmp_tags(self, text1, text2):
         """decide whether the two tags are matched"""
-        return self.cosine_similarity(text1, text2) > 0.5
+        similarity = self.cosine_similarity(text1, text2)
+        confidence = Confidence.NO
+        if similarity > 0.5: # highly confident
+            confidence = Confidence.HIGH
+        elif similarity > 0.2: # median confident
+            confidence = Confidence.MEDIAN
+        else: # no confidence
+            confidence = Confidence.NO
+        return confidence
