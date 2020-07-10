@@ -154,7 +154,7 @@ class Database:
         if columns is None:
             columns = ['*']
         cursor = self.conn.cursor()
-        cursor.execute(f'SELECT {".".join(columns)} from {tname}')
+        cursor.execute(f'SELECT {",".join(columns)} from {tname}')
         return cursor.fetchall()
 
     def search(self, tname, key, value, columns=None):
