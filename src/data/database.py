@@ -169,9 +169,7 @@ class Database:
             keys: list<str>, fields needed updating
             values: list, updating values
             key: str, search key
-            value: search value
-        return:
-            True or False"""
+            value: search value"""
         table = self.tables[tname]
         # form update sequence
         update_seq = ','.join([field+'='+str(table.revise_data(field, values[idx]))\
@@ -184,7 +182,18 @@ class Database:
         cursor.execute(f"UPDATE {tname} set "
                        f"{update_seq} {where};")
         self.conn.commit()
-        return True
+
+    def delete(self, tname, key, value):
+        """delete certain rows
+        params:
+            tname: name of table
+            key: field name
+            value: value of the field"""
+        table = self.tables[tname]
+        cursor = self.conn.cursor()
+        cursor.execute(f"DELETE from {tname} "
+                       f"where {key}={table.revise_data(key, value)}")
+        self.conn.commit()
 
 if __name__ == "__main__":
     TABLE = "test_table"
@@ -206,6 +215,9 @@ if __name__ == "__main__":
     print(database.search(TABLE, 'tags', 'meeting time'))
     database.update(TABLE, ["msg"], ["meeting at 8:00"], "id", 2)
     print(database.search(TABLE, 'id', 2))
+    print(database.search(TABLE, 'id', 1))
+    database.delete(TABLE, "id", 1)
+    print(database.search(TABLE, 'id', 1))
     database2 = Database(PATH)
+    print(database2.search(TABLE, 'id', 1))
     print(database2.search(TABLE, 'id', 2))
-    
