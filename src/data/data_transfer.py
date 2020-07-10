@@ -6,7 +6,7 @@ from data.msg_with_tag import MsgWithTag
 
 class DataTransfer:
     """Transfer msg with tags class to database"""
-    def __init__(self, database: Database, tname="Messages"):
+    def __init__(self, database: Database, tname='Messages'):
         """params:
             database: Database instance
             tname: name of table to store information"""
@@ -18,13 +18,18 @@ class DataTransfer:
         if tname not in database.get_all_tables_name():
             database.create_table(tname, PrimaryKey.id_as_primary(), self.fields)
 
+    def save(self):
+        """save changes"""
+        self.database.close()
+        self.database.reconnect()
+
     def data_to_msg(self, data):
         """turn data fetched from database to MsgWithTag instance
         params:
             data: data fetched from database(tuple)"""
         fields_names = [self.primary_key] + [field.name for field in self.fields]
         data_dict = {}
-        for idx, field in fields_names:
+        for idx, field in enumerate(fields_names):
             data_dict[field] = data[idx]
         return MsgWithTag.from_dict(data_dict)
 
