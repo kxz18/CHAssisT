@@ -30,12 +30,20 @@ def test_save_msg(msg='hahah', tag='test tag'):
 
 def test_del_msg_by_id():
     """test delete a message"""
-    test_save_msg()
     interface = DataTransfer(Database(PATH))
     interface.del_msg_by_id(1)
     assert interface.get_msg_by_id(1) is None
+    interface.save()
 
 def test_get_all_msgs():
     """test get all messages"""
-    test_save_msg()
+    test_save_msg('second', 'test 2')
+    test_save_msg('third', 'test 3')
+    interface = DataTransfer(Database(PATH))
+    assert len(interface.get_all_msgs()) == 2
 
+def test_get_all_id_and_tags():
+    """test get all id and tags"""
+    interface = DataTransfer(Database(PATH))
+    print(interface.get_all_id_and_tags())
+    
