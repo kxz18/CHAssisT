@@ -45,3 +45,8 @@ def test_delete():
     database.delete(TABLE, "id", 1)
     assert len(database.search(TABLE, 'id', 1)) == 0
     database.close()
+
+def test_select():
+    """test select function"""
+    database = Database(PATH)
+    assert len(database.select(TABLE, ['id', 'tags'])) == 2
