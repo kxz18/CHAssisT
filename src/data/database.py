@@ -143,6 +143,20 @@ class Database:
                        f"VALUES ({','.join(values)})")
         self.conn.commit()
 
+    def select(self, tname, columns=None):
+        """select columns from table
+        params:
+            tname: name of table
+            columns: required fields, default all
+        return:
+            list<tuple of data>"""
+        # initialize columns
+        if columns is None:
+            columns = ['*']
+        cursor = self.conn.cursor()
+        cursor.execute(f"SELECT {'.'.join(columns)} from {tname}")
+        return cursor.fetchall()
+
     def search(self, tname, key, value, columns=None):
         """search by id in selected table
         params:
@@ -160,7 +174,7 @@ class Database:
         cursor = self.conn.cursor()
         cursor.execute(f"SELECT {','.join(columns)} from {tname} "
                        f"where {key}={table.revise_data(key, value)}")
-        return cursor.fetchall() if cursor.rowcount != 0 else None
+        return cursor.fetchall()
 
     def update(self, tname, keys, values, key=None, value=None):
         """update values of selected rows
