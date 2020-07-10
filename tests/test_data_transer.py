@@ -45,5 +45,7 @@ def test_get_all_msgs():
 def test_get_all_id_and_tags():
     """test get all id and tags"""
     interface = DataTransfer(Database(PATH))
-    print(interface.get_all_id_and_tags())
-    
+    all_data = interface.get_all_id_and_tags()
+    assert len(all_data) == 2
+    assert all_data[0][1] == 'test 2'
+    assert all_data[1][1] == 'test 3'
