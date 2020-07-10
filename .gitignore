@@ -107,3 +107,9 @@ t.*
 dist/
 .pytype/
 token.txt
+
+#sqlite3
+*.db
+
+#pickle
+*.pkl
