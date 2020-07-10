@@ -29,7 +29,7 @@ class DataTransfer:
             data: data fetched from database(tuple)"""
         fields_names = [self.primary_key] + [field.name for field in self.fields]
         data_dict = {}
-        for idx, field in fields_names:
+        for idx, field in enumerate(fields_names):
             data_dict[field] = data[idx]
         return MsgWithTag.from_dict(data_dict)
 
