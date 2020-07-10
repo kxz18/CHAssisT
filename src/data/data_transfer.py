@@ -18,6 +18,11 @@ class DataTransfer:
         if tname not in database.get_all_tables_name():
             database.create_table(tname, PrimaryKey.id_as_primary(), self.fields)
 
+    def save(self):
+        """save changes"""
+        self.database.close()
+        self.database.reconnect()
+
     def data_to_msg(self, data):
         """turn data fetched from database to MsgWithTag instance
         params:
