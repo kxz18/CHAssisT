@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # -*- coding:utf-8 -*-
 """interface between msg with tags and database"""
-from src.data.database import Database, PrimaryKey
-from src.data.msg_with_tag import MsgWithTag
+from data.database import Database, PrimaryKey
+from data.msg_with_tag import MsgWithTag
 
 class DataTransfer:
     """Transfer msg with tags class to database"""

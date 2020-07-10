@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding:utf-8 -*-
 """The data structure of messages with tags"""
-from src.data.database import Field
+from data.database import Field
 
 class MsgWithTag:
     """message with tag"""
