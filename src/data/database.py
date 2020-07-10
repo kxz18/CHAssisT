@@ -194,30 +194,3 @@ class Database:
         cursor.execute(f"DELETE from {tname} "
                        f"where {key}={table.revise_data(key, value)}")
         self.conn.commit()
-
-if __name__ == "__main__":
-    TABLE = "test_table"
-    PATH = "test.db"
-    import os
-    try:
-        os.remove(PATH)
-    except FileNotFoundError:
-        pass
-    # create database
-    database = Database(PATH)
-    primary_key = PrimaryKey.id_as_primary()
-    fields = [Field("msg", "TEXT"), Field("tags", "CHAR(50)")]
-    database.create_table(TABLE, primary_key, fields)
-    database.insert(TABLE, ["msg", "tags"], ["hehe", "no use"])
-    database.insert(TABLE, ["msg", "tags"], ["meeting at 9:00", "meeting time"])
-    database.insert(TABLE, ["msg", "tags"], ["what?", "meeting time"])
-    print(database.search(TABLE, 'id', 2))
-    print(database.search(TABLE, 'tags', 'meeting time'))
-    database.update(TABLE, ["msg"], ["meeting at 8:00"], "id", 2)
-    print(database.search(TABLE, 'id', 2))
-    print(database.search(TABLE, 'id', 1))
-    database.delete(TABLE, "id", 1)
-    print(database.search(TABLE, 'id', 1))
-    database2 = Database(PATH)
-    print(database2.search(TABLE, 'id', 1))
-    print(database2.search(TABLE, 'id', 2))
