@@ -6,7 +6,7 @@ from data.msg_with_tag import MsgWithTag
 
 class DataTransfer:
     """Transfer msg with tags class to database"""
-    def __init__(self, database: Database, tname="Messages"):
+    def __init__(self, database: Database, tname='Messages'):
         """params:
             database: Database instance
             tname: name of table to store information"""
