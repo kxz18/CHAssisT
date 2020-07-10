@@ -4,6 +4,7 @@
 import sqlite3
 import pickle
 
+
 class Field:
     """class of a field in database"""
     def __init__(self, name, dtype, null=True, others=None):
@@ -21,14 +22,15 @@ class Field:
         """turn attributes to list"""
         elements = [self.name, self.dtype]
         if not self.null:
-            elements.append("NOT NULL")
+            elements.append('NOT NULL')
         if isinstance(self.others, list):
             elements += self.others
         return elements
 
     def to_str(self):
         """turn attributes to string"""
-        return " ".join(self.to_list())
+        return ' '.join(self.to_list())
+
 
 class PrimaryKey(Field):
     """primary key class"""
@@ -36,14 +38,15 @@ class PrimaryKey(Field):
     def to_list(self):
         """turn attributes to list"""
         elements = super(PrimaryKey, self).to_list()
-        elements.insert(2, "PRIMARY KEY")
+        elements.insert(2, 'PRIMARY KEY')
         return elements
 
     @classmethod
     def id_as_primary(cls):
         """use auto incremental int id as primary key"""
-        return PrimaryKey(name="id", dtype="INTEGER",\
-                null=False)
+        return PrimaryKey(name='id', dtype='INTEGER',
+                          null=False)
+
 
 class Table:
     """store information of a table"""
@@ -83,9 +86,10 @@ class Table:
             value = f'\'{value}\''
         return value
 
+
 class Database:
     """use sqlite as database"""
-    def __init__(self, path, config_path="database_config.pkl"):
+    def __init__(self, path, config_path='database_config.pkl'):
         """params:
             path: path of data file
             cofig_path: path of database config file"""
@@ -111,7 +115,7 @@ class Database:
         self.conn.close()
         with open(self.config_path, 'wb') as fout:
             pickle.dump(self.tables, fout)
-    
+
     def get_all_tables_name(self):
         """return list of name of tables"""
         return list(self.tables.keys())
@@ -124,9 +128,9 @@ class Database:
             fields: list of fields, each is a list
         """
         cursor = self.conn.cursor()
-        cursor.execute(f"CREATE TABLE {tname}"
-                       f"({primary.to_str()}, "
-                       f"{','.join([field.to_str() for field in fields])});")
+        cursor.execute(f'CREATE TABLE {tname}'
+                       f'({primary.to_str()}, '
+                       f'{",".join([field.to_str() for field in fields])});')
         self.conn.commit()
         # store table locally
         self.tables[tname] = Table(tname, primary, fields)
@@ -143,8 +147,8 @@ class Database:
             values[idx] = table.revise_data(key, values[idx])
         # start inserting
         cursor = self.conn.cursor()
-        cursor.execute(f"INSERT INTO {tname} ({','.join(keys)}) "
-                       f"VALUES ({','.join(values)})")
+        cursor.execute(f'INSERT INTO {tname} ({",".join(keys)}) '
+                       f'VALUES ({",".join(values)})')
         self.conn.commit()
 
     def select(self, tname, columns=None):
@@ -158,7 +162,7 @@ class Database:
         if columns is None:
             columns = ['*']
         cursor = self.conn.cursor()
-        cursor.execute(f"SELECT {'.'.join(columns)} from {tname}")
+        cursor.execute(f'SELECT {",".join(columns)} from {tname}')
         return cursor.fetchall()
 
     def search(self, tname, key, value, columns=None):
@@ -176,10 +180,11 @@ class Database:
 
         table = self.tables[tname]
         cursor = self.conn.cursor()
-        cursor.execute(f"SELECT {','.join(columns)} from {tname} "
-                       f"where {key}={table.revise_data(key, value)}")
+        cursor.execute(f'SELECT {",".join(columns)} from {tname} '
+                       f'where {key}={table.revise_data(key, value)}')
         return cursor.fetchall()
 
+    # pylint:disable=R0913
     def update(self, tname, keys, values, key=None, value=None):
         """update values of selected rows
         params:
@@ -190,15 +195,15 @@ class Database:
             value: search value"""
         table = self.tables[tname]
         # form update sequence
-        update_seq = ','.join([field+'='+str(table.revise_data(field, values[idx]))\
-                for idx, field in enumerate(keys)])
+        update_seq = ','.join([field + '=' + str(table.revise_data(field, values[idx]))
+                               for idx, field in enumerate(keys)])
         # form where subcmd
         where = ''
         if key is not None:
-            where = f"where {key}={table.revise_data(key, value)}"
+            where = f'where {key}={table.revise_data(key, value)}'
         cursor = self.conn.cursor()
-        cursor.execute(f"UPDATE {tname} set "
-                       f"{update_seq} {where};")
+        cursor.execute(f'UPDATE {tname} set '
+                       f'{update_seq} {where};')
         self.conn.commit()
 
     def delete(self, tname, key, value):
@@ -209,6 +214,6 @@ class Database:
             value: value of the field"""
         table = self.tables[tname]
         cursor = self.conn.cursor()
-        cursor.execute(f"DELETE from {tname} "
-                       f"where {key}={table.revise_data(key, value)}")
+        cursor.execute(f'DELETE from {tname} '
+                       f'where {key}={table.revise_data(key, value)}')
         self.conn.commit()
