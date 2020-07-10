@@ -111,6 +111,10 @@ class Database:
         self.conn.close()
         with open(self.config_path, 'wb') as fout:
             pickle.dump(self.tables, fout)
+    
+    def get_all_tables_name(self):
+        """return list of name of tables"""
+        return list(self.tables.keys())
 
     def create_table(self, tname, primary, fields):
         """create a table
