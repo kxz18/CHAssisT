@@ -4,6 +4,7 @@
 import sqlite3
 import pickle
 
+
 class Field:
     """class of a field in database"""
     def __init__(self, name, dtype, null=True, others=None):
@@ -30,6 +31,7 @@ class Field:
         """turn attributes to string"""
         return ' '.join(self.to_list())
 
+
 class PrimaryKey(Field):
     """primary key class"""
 
@@ -42,8 +44,9 @@ class PrimaryKey(Field):
     @classmethod
     def id_as_primary(cls):
         """use auto incremental int id as primary key"""
-        return PrimaryKey(name='id', dtype='INTEGER',\
-                null=False)
+        return PrimaryKey(name='id', dtype='INTEGER',
+                          null=False)
+
 
 class Table:
     """store information of a table"""
@@ -83,6 +86,7 @@ class Table:
             value = f'\'{value}\''
         return value
 
+
 class Database:
     """use sqlite as database"""
     def __init__(self, path, config_path='database_config.pkl'):
@@ -111,7 +115,7 @@ class Database:
         self.conn.close()
         with open(self.config_path, 'wb') as fout:
             pickle.dump(self.tables, fout)
-    
+
     def get_all_tables_name(self):
         """return list of name of tables"""
         return list(self.tables.keys())
@@ -180,6 +184,7 @@ class Database:
                        f'where {key}={table.revise_data(key, value)}')
         return cursor.fetchall()
 
+    # pylint:disable=R0913
     def update(self, tname, keys, values, key=None, value=None):
         """update values of selected rows
         params:
@@ -190,8 +195,8 @@ class Database:
             value: search value"""
         table = self.tables[tname]
         # form update sequence
-        update_seq = ','.join([field+'='+str(table.revise_data(field, values[idx]))\
-                for idx, field in enumerate(keys)])
+        update_seq = ','.join([field + '=' + str(table.revise_data(field, values[idx]))
+                               for idx, field in enumerate(keys)])
         # form where subcmd
         where = ''
         if key is not None:

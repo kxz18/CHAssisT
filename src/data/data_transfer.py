@@ -4,6 +4,7 @@
 from data.database import Database, PrimaryKey
 from data.msg_with_tag import MsgWithTag
 
+
 class DataTransfer:
     """Transfer msg with tags class to database"""
     def __init__(self, database: Database, tname='Messages'):
@@ -13,7 +14,7 @@ class DataTransfer:
         self.database = database
         self.tname = tname
         self.primary_key = PrimaryKey.id_as_primary().name
-        self.fields = MsgWithTag.to_fields() # no auto-increment id
+        self.fields = MsgWithTag.to_fields()  # no auto-increment id
         # create table
         if tname not in database.get_all_tables_name():
             database.create_table(tname, PrimaryKey.id_as_primary(), self.fields)
@@ -38,8 +39,8 @@ class DataTransfer:
         params:
             msg: tagged message"""
         data_dict = msg.__dict__
-        self.database.insert(self.tname, list(data_dict.keys()),\
-                list(data_dict.values()))
+        self.database.insert(self.tname, list(data_dict.keys()),
+                             list(data_dict.values()))
 
     def del_msg_by_id(self, value):
         """delete stored message by id number
@@ -51,10 +52,10 @@ class DataTransfer:
         """return MsgWithTag instance of selected message
         params:
             value: id number"""
-        msg_data = self.database.search(self.tname,\
-                self.primary_key, value)
+        msg_data = self.database.search(self.tname,
+                                        self.primary_key, value)
         if len(msg_data) != 0:
-            return self.data_to_msg(msg_data[0]) # id is unique
+            return self.data_to_msg(msg_data[0])    # id is unique
         return None
 
     def get_all_msgs(self):
@@ -69,5 +70,5 @@ class DataTransfer:
 
     def get_all_id_and_tags(self):
         """return list of tuples(id, tags)"""
-        return self.database.select(self.tname,\
-                [self.primary_key, 'tags'])
+        return self.database.select(self.tname,
+                                    [self.primary_key, 'tags'])

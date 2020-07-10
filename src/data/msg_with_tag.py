@@ -3,6 +3,7 @@
 """The data structure of messages with tags"""
 from data.database import Field
 
+
 class MsgWithTag:
     """message with tag"""
     def __init__(self, quoted, tags):
@@ -22,5 +23,5 @@ class MsgWithTag:
     @classmethod
     def to_fields(cls):
         """turn class to list of fields"""
-        return [Field('msg', 'TEXT'),\
+        return [Field('msg', 'TEXT'),
                 Field('tags', 'TEXT')]
