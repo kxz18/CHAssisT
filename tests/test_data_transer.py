@@ -4,6 +4,7 @@
 import os
 import sys
 sys.path.append('src')
+from datetime import datetime
 from data.data_transfer import DataTransfer
 from data.database import Database
 from data.msg_with_tag import MsgWithTag
@@ -20,10 +21,10 @@ def test_create():
     interface = DataTransfer(Database(PATH))
     interface.save()
 
-def test_save_msg(msg='hahah', tag='test tag'):
+def test_save_msg(msg='hahah', tag='test tag', talker='admin', expiry=None):
     """test save a message"""
     interface = DataTransfer(Database(PATH))
-    msg = MsgWithTag(msg, tag)
+    msg = MsgWithTag(msg, tag, talker, expiry)
     interface.save_msg(msg)
     assert interface.get_msg_by_id(1) is not None
     interface.save()
@@ -37,10 +38,13 @@ def test_del_msg_by_id():
 
 def test_get_all_msgs():
     """test get all messages"""
-    test_save_msg('second', 'test 2')
+    test_save_msg('second', 'test 2', 'admin2', datetime(2020, 3, 26))
     test_save_msg('third', 'test 3')
     interface = DataTransfer(Database(PATH))
-    assert len(interface.get_all_msgs()) == 2
+    all_msg = interface.get_all_msgs()
+    _, msg = all_msg[0]
+    assert len(all_msg) == 2
+    assert msg.expiry == datetime(2020, 3, 26)
 
 def test_get_all_id_and_tags():
     """test get all id and tags"""
