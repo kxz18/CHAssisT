@@ -217,3 +217,17 @@ class Database:
         cursor.execute(f'DELETE from {tname} '
                        f'where {key}={table.revise_data(key, value)}')
         self.conn.commit()
+
+    def delete_by_time(self, tname, time_key, start, end):
+        """delete certain rows by time range, None means infinite
+        params:
+            tname: name of table
+            time_key: str, field name of time stamp
+            start: datetime, start time
+            end: datetime, end time"""
+        table = self.tables[tname]
+        cursor = self.conn.cursor()
+        cursor.execute(f'DELETE from {tname} '
+                       f'where {time_key}>={table.revise_data(time_key, str(start))} and '
+                       f'{time_key}<={table.revise_data(time_key, str(end))}')
+        self.conn.commit()
