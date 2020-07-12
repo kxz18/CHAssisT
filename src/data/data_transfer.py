@@ -77,6 +77,15 @@ class DataTransfer:
             return self.data_to_msg(msg_data[0])    # id is unique
         return None
 
+    def get_msg_by_content(self, content):
+        """return MsgWithTag instance with msg the same as content
+        params:
+            content: str, value of msg"""
+        msg_data = self.database.search(self.tname, MsgWithTag.get_msg_key(), content)
+        if len(msg_data) != 0:
+            return self.data_to_msg(msg_data[0])
+        return None
+
     def get_all_msgs(self):
         """return all stored tagged messages
         return:

@@ -2,6 +2,7 @@
 # -*- coding:utf-8 -*-
 """handle commands of saving and deleting stored messages"""
 import re
+from datetime import timedelta
 from dateutil.parser import parse
 from apscheduler.schedulers.blocking import BlockingScheduler
 from data.data_transfer import DataTransfer
@@ -68,6 +69,11 @@ class TagController:
             expiry = None
         tags = QuestionAnswering.get_tags_from_msg(content)
         self.interface.save_msg(MsgWithTag(quoted, tags, talker, expiry))
+        if expiry is not None:
+            # create after-expiry delete
+            _id = self.interface.get_msg_by_content(quoted)[0]
+            self.scheduler.add_job(self.interface.del_msg_by_id, 'date',
+                                   run_date=expiry, args=[_id])
         return True
 
     def handle_delete(self, msg):
@@ -89,11 +95,11 @@ class TagController:
         res = pattern.match(re.sub(r'\s+', '', msg))
         if res is None:
             return False
-        self.scheduler.add_job(self.interface.del_by_days, 'cron',
+        self.scheduler.add_job(self.interface.del_msg_by_timedelta, 'cron',
                                years=res.group(1), month=res.group(2),
                                day=res.group(3), day_of_week=res.group(4),
                                hour=res.group(5), minute=res.group(6),
-                               args=[int(res.group(7))])
+                               args=[timedelta(days=int(res.group(7)))])
         return True
 
     def handle_stop_timed_delete(self, msg: str):
