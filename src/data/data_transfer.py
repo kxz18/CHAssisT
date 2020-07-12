@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding:utf-8 -*-
 """interface between msg with tags and database"""
+from datetime import datetime, timedelta
 from data.database import Database, PrimaryKey
 from data.msg_with_tag import MsgWithTag
 
@@ -47,6 +48,14 @@ class DataTransfer:
         params:
             value: id number"""
         self.database.delete(self.tname, self.primary_key, value)
+
+    def del_msg_by_timedelta(self, delta):
+        """delete msgs that are given days ago
+        params:
+            delta: timedelta, time span"""
+        end = datetime.now() - delta
+        self.database.delete_by_time(self.tname, MsgWithTag.get_time_key(),
+                                     None, end)
 
     def get_msg_by_id(self, value):
         """return MsgWithTag instance of selected message

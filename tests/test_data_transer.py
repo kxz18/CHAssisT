@@ -4,7 +4,7 @@
 import os
 import sys
 sys.path.append('src')
-from datetime import datetime
+from datetime import datetime, timedelta
 from data.data_transfer import DataTransfer
 from data.database import Database
 from data.msg_with_tag import MsgWithTag
@@ -21,10 +21,10 @@ def test_create():
     interface = DataTransfer(Database(PATH))
     interface.save()
 
-def test_save_msg(msg='hahah', tag='test tag', talker='admin', expiry=None):
+def test_save_msg(msg='hahah', tag='test tag', talker='admin', expiry=None, time=None):
     """test save a message"""
     interface = DataTransfer(Database(PATH))
-    msg = MsgWithTag(msg, tag, talker, expiry)
+    msg = MsgWithTag(msg, tag, talker, expiry, time)
     interface.save_msg(msg)
     assert interface.get_msg_by_id(1) is not None
     interface.save()
@@ -53,3 +53,11 @@ def test_get_all_id_and_tags():
     assert len(all_data) == 2
     assert all_data[0][1] == 'test 2'
     assert all_data[1][1] == 'test 3'
+
+def test_del_by_time():
+    """test delete by time stamp"""
+    interface = DataTransfer(Database(PATH))
+    data_num = len(interface.get_all_msgs())
+    test_save_msg(time=datetime.now() - timedelta(days=3))
+    interface.del_msg_by_timedelta(timedelta(days=3))
+    assert len(interface.get_all_msgs()) == data_num
