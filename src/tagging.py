@@ -35,8 +35,14 @@ class Tagging(WechatyPlugin):
         from_contact = msg.talker()
         text = msg.text()
         room = msg.room()
+        quoted = await msg.mention_text()
+        to_bot = self.bot.contact_id in msg.payload.mention_ids or\
+                 self.bot.contact_id == msg.payload.to_id
         conversation: Union[
             Room, Contact] = from_contact if room is None else room
         await conversation.ready()
         await conversation.say('hey man')
+        #self.tag_controller.handle_msg()
         print(msg.__dict__)
+        print('text: hh ', text)
+        print('quoted: hh ', quoted)
