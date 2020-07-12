@@ -35,13 +35,23 @@ class DataTransfer:
             data_dict[field] = data[idx]
         return MsgWithTag.from_dict(data_dict)
 
-    def save_msg(self, msg: MsgWithTag):
+    def save_msg(self, msg: MsgWithTag, force_create=False):
         """save tagged message
         params:
-            msg: tagged message"""
+            msg: tagged message
+            force_create: bool, force creating new item"""
         data_dict = msg.__dict__
-        self.database.insert(self.tname, list(data_dict.keys()),
-                             list(data_dict.values()))
+        existing_msg = self.database.search(self.tname, MsgWithTag.get_msg_key(),
+                                            msg.msg, columns=[self.primary_key])
+        if existing_msg and not force_create:
+            # update
+            self.database.update(self.tname, list(data_dict.keys()),
+                                 list(data_dict.values()), key=self.primary_key,
+                                 value=existing_msg[0][0])
+        else:
+            # insert
+            self.database.insert(self.tname, list(data_dict.keys()),
+                                 list(data_dict.values()))
 
     def del_msg_by_id(self, value):
         """delete stored message by id number
