@@ -8,6 +8,7 @@ from data.database import Field
 
 class MsgWithTag:
     """message with tag"""
+    # pylint: disable R0913
     def __init__(self, quoted, tags, talker, expiry=None, create_time=None):
         """params:
             quoted: str, quoted message

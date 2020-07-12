@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding:utf-8 -*-
 """interface between msg with tags and database"""
-from datetime import datetime, timedelta
+from datetime import datetime
 from data.database import Database, PrimaryKey
 from data.msg_with_tag import MsgWithTag
 
