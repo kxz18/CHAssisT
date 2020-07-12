@@ -39,3 +39,8 @@ class MsgWithTag:
                 Field('talker', 'TEXT'),
                 Field('expiry', 'CHAR(30)'),
                 Field('time', 'CHAR(30)')]
+
+    @classmethod
+    def get_time_key(cls):
+        """return key of time stamp"""
+        return 'time'

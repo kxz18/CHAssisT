@@ -227,7 +227,15 @@ class Database:
             end: datetime, end time"""
         table = self.tables[tname]
         cursor = self.conn.cursor()
-        cursor.execute(f'DELETE from {tname} '
-                       f'where {time_key}>={table.revise_data(time_key, str(start))} and '
-                       f'{time_key}<={table.revise_data(time_key, str(end))}')
+        start_condition = f'{time_key}>={table.revise_data(time_key, str(start))}'
+        end_condition = f'{time_key}<={table.revise_data(time_key, str(end))}'
+        if start is None:
+            # delete until end
+            cursor.execute(f'DELETE from {tname} where {end_condition}')
+        elif end is None:
+            # delete from start
+            cursor.execute(f'DELETE from {tname} where {start_condition}')
+        else:
+            # delete in range(start, end)
+            cursor.execute(f'DELETE from {tname} where {start_condition} and {end_condition}')
         self.conn.commit()
