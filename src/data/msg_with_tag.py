@@ -44,3 +44,8 @@ class MsgWithTag:
     def get_time_key(cls):
         """return key of time stamp"""
         return 'time'
+
+    @classmethod
+    def get_msg_key(cls):
+        """return key of quoted message"""
+        return 'msg'

@@ -21,11 +21,12 @@ def test_create():
     interface = DataTransfer(Database(PATH))
     interface.save()
 
-def test_save_msg(msg='hahah', tag='test tag', talker='admin', expiry=None, time=None):
+def test_save_msg(msg='hahah', tag='test tag', talker='admin',
+                  expiry=None, time=None, force_create=True):
     """test save a message"""
     interface = DataTransfer(Database(PATH))
     msg = MsgWithTag(msg, tag, talker, expiry, time)
-    interface.save_msg(msg)
+    interface.save_msg(msg, force_create=force_create)
     assert interface.get_msg_by_id(1) is not None
     interface.save()
 
@@ -61,3 +62,15 @@ def test_del_by_time():
     test_save_msg(time=datetime.now() - timedelta(days=3))
     interface.del_msg_by_timedelta(timedelta(days=3))
     assert len(interface.get_all_msgs()) == data_num
+
+
+def test_update():
+    """test insert duplicated message with different tag"""
+    interface = DataTransfer(Database(PATH))
+    test_save_msg(msg='update message', tag='test update')
+    data_num = len(interface.get_all_msgs())
+    test_save_msg(msg='update message', tag='test update 2', force_create=False)
+    all_msg = interface.get_all_msgs()
+    assert len(all_msg) == data_num
+    assert all_msg[-1][1].msg == 'update message'
+    assert all_msg[-1][1].tags == 'test update 2'
