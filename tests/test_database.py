@@ -9,6 +9,7 @@ from data.database import Database, PrimaryKey, Field
 
 TABLE = "test_table"
 PATH = "test.db"
+config = 'database_config.pkl'
 
 def test_create():
     """create table"""
