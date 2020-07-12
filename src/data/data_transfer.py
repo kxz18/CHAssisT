@@ -19,6 +19,7 @@ class DataTransfer:
         # create table
         if tname not in database.get_all_tables_name():
             database.create_table(tname, PrimaryKey.id_as_primary(), self.fields)
+            self.save()
 
     def save(self):
         """save changes"""
@@ -52,12 +53,14 @@ class DataTransfer:
             # insert
             self.database.insert(self.tname, list(data_dict.keys()),
                                  list(data_dict.values()))
+        self.save()
 
     def del_msg_by_id(self, value):
         """delete stored message by id number
         params:
             value: id number"""
         self.database.delete(self.tname, self.primary_key, value)
+        self.save()
 
     def del_msg_by_timedelta(self, delta):
         """delete msgs that are given days ago
@@ -66,6 +69,7 @@ class DataTransfer:
         end = datetime.now() - delta
         self.database.delete_by_time(self.tname, MsgWithTag.get_time_key(),
                                      None, end)
+        self.save()
 
     def get_msg_by_id(self, value):
         """return MsgWithTag instance of selected message
@@ -78,12 +82,12 @@ class DataTransfer:
         return None
 
     def get_msg_by_content(self, content):
-        """return MsgWithTag instance with msg the same as content
+        """return (id, MsgWithTag instance) with msg the same as content
         params:
             content: str, value of msg"""
         msg_data = self.database.search(self.tname, MsgWithTag.get_msg_key(), content)
         if len(msg_data) != 0:
-            return self.data_to_msg(msg_data[0])
+            return (msg_data[0][0], self.data_to_msg(msg_data[0]))
         return None
 
     def get_all_msgs(self):

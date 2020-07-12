@@ -4,12 +4,13 @@
 import re
 from datetime import timedelta
 from dateutil.parser import parse
-from apscheduler.schedulers.blocking import BlockingScheduler
+from apscheduler.schedulers.background import BackgroundScheduler
 from data.data_transfer import DataTransfer
 from data.msg_with_tag import MsgWithTag
 from question_answering import QuestionAnswering
+import reply
 
-KEY_EXPIRY = '#expiry'
+KEY_EXPIRY = 'expiry'
 KEY_DELETE = 'delete'
 KEY_SPLIT = r'#'
 
@@ -20,7 +21,8 @@ class TagController:
             interface: interface of database"""
         self.interface = interface
         self.reply = ''  # during handling, help or reply messages may be needed
-        self.scheduler = BlockingScheduler()
+        self.scheduler = BackgroundScheduler()
+        self.scheduler.start()
 
     def handle_msg(self, quoted, msg, talker, to_bot):
         """handle commands
@@ -74,16 +76,19 @@ class TagController:
             _id = self.interface.get_msg_by_content(quoted)[0]
             self.scheduler.add_job(self.interface.del_msg_by_id, 'date',
                                    run_date=expiry, args=[_id])
+        self.reply = reply.save_msg_success()
         return True
 
     def handle_delete(self, msg):
         """handle delete command"""
         # pattern is like 'delete#123'
-        pattern = re.compile(f'{KEY_EXPIRY}' + KEY_SPLIT + r'(\d+)$')
+        pattern = re.compile(KEY_DELETE + KEY_SPLIT + r'(\d+)$')
         res = pattern.match(re.sub(r'\s+', '', msg))    # get rid of spaces
         if res is None:
             return False
-        self.interface.del_msg_by_id(int(res.group(1)))
+        _id = int(res.group(1))
+        self.interface.del_msg_by_id(_id)
+        self.reply = reply.del_msg_success(_id)
         return True
 
     def handle_timed_delete(self, msg: str):
@@ -91,12 +96,12 @@ class TagController:
         # pattern is like 'timed delete#y-m-d-dof-h-min-x'
         # data which are x days before will be deleted
         pattern = re.compile(KEY_DELETE + KEY_SPLIT +
-                             '-'.join([r'(\d+|*)' for _ in range(7)]))
+                             '-'.join([r'(\d+|\*)' for _ in range(7)]))
         res = pattern.match(re.sub(r'\s+', '', msg))
         if res is None:
             return False
         self.scheduler.add_job(self.interface.del_msg_by_timedelta, 'cron',
-                               years=res.group(1), month=res.group(2),
+                               year=res.group(1), month=res.group(2),
                                day=res.group(3), day_of_week=res.group(4),
                                hour=res.group(5), minute=res.group(6),
                                args=[timedelta(days=int(res.group(7)))])
