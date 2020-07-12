@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding:utf-8 -*-
 """interface between msg with tags and database"""
+from datetime import datetime, timedelta
 from data.database import Database, PrimaryKey
 from data.msg_with_tag import MsgWithTag
 
@@ -34,19 +35,37 @@ class DataTransfer:
             data_dict[field] = data[idx]
         return MsgWithTag.from_dict(data_dict)
 
-    def save_msg(self, msg: MsgWithTag):
+    def save_msg(self, msg: MsgWithTag, force_create=False):
         """save tagged message
         params:
-            msg: tagged message"""
+            msg: tagged message
+            force_create: bool, force creating new item"""
         data_dict = msg.__dict__
-        self.database.insert(self.tname, list(data_dict.keys()),
-                             list(data_dict.values()))
+        existing_msg = self.database.search(self.tname, MsgWithTag.get_msg_key(),
+                                            msg.msg, columns=[self.primary_key])
+        if existing_msg and not force_create:
+            # update
+            self.database.update(self.tname, list(data_dict.keys()),
+                                 list(data_dict.values()), key=self.primary_key,
+                                 value=existing_msg[0][0])
+        else:
+            # insert
+            self.database.insert(self.tname, list(data_dict.keys()),
+                                 list(data_dict.values()))
 
     def del_msg_by_id(self, value):
         """delete stored message by id number
         params:
             value: id number"""
         self.database.delete(self.tname, self.primary_key, value)
+
+    def del_msg_by_timedelta(self, delta):
+        """delete msgs that are given days ago
+        params:
+            delta: timedelta, time span"""
+        end = datetime.now() - delta
+        self.database.delete_by_time(self.tname, MsgWithTag.get_time_key(),
+                                     None, end)
 
     def get_msg_by_id(self, value):
         """return MsgWithTag instance of selected message
