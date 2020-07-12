@@ -49,11 +49,11 @@ class DataTransfer:
             value: id number"""
         self.database.delete(self.tname, self.primary_key, value)
 
-    def del_msg_by_days(self, days):
+    def del_msg_by_timedelta(self, delta):
         """delete msgs that are given days ago
         params:
-            days: int, time span"""
-        end = datetime.now() - timedelta(days=days)
+            delta: timedelta, time span"""
+        end = datetime.now() - delta
         self.database.delete_by_time(self.tname, MsgWithTag.get_time_key(),
                                      None, end)
 

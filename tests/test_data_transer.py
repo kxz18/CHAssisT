@@ -59,5 +59,5 @@ def test_del_by_time():
     interface = DataTransfer(Database(PATH))
     data_num = len(interface.get_all_msgs())
     test_save_msg(time=datetime.now() - timedelta(days=3))
-    interface.del_msg_by_days(3)
+    interface.del_msg_by_timedelta(timedelta(days=3))
     assert len(interface.get_all_msgs()) == data_num
