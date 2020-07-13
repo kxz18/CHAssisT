@@ -6,8 +6,9 @@ import re
 from typing import Union
 import pickle
 
-from wechaty import Message, Contact, Room, ContactSelf
+from wechaty import Message, Contact, Room
 from wechaty.plugin import WechatyPlugin
+from wechaty.user.contact_self import ContactSelf
 
 from data.database import Database
 from data.data_transfer import DataTransfer
