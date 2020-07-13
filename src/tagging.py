@@ -6,7 +6,7 @@ import re
 from typing import Union
 import pickle
 
-from wechaty import Message, Contact, Room
+from wechaty import Message, Contact, Room, ContactSelf
 from wechaty.plugin import WechatyPlugin
 
 from data.database import Database
@@ -31,17 +31,18 @@ class Tagging(WechatyPlugin):
         self.interface = DataTransfer(Database(data_path, config_path))
         self.question_answering = QuestionAnswering(self.interface)
         self.tag_controller = TagController(self.interface)
+        self.contact = self.my_self()
 
     async def on_message(self, msg: Message):
         """listen message event"""
         #with open("test_message.pkl", 'wb') as fout:
         #    pickle.dump(msg, fout)
-        #bot_contact = self.Contact.load(self.puppet.self_id())
         from_contact = msg.talker()
         quoted, text, mention = self.split_quote_and_mention(msg.text())
         room = msg.room()
-        to_bot = self.bot.contact_id in msg.payload.mention_ids or\
-                 self.bot.contact_id == msg.payload.to_id
+        to_bot = self.contact.contact_id in msg.payload.mention_ids or\
+                 self.contact.contact_id == msg.payload.to_id or\
+                 self.contact.name() == mention
         conversation: Union[
             Room, Contact] = from_contact if room is None else room
         await conversation.ready()
@@ -52,12 +53,12 @@ class Tagging(WechatyPlugin):
             await conversation.say(self.tag_controller.get_reply())
         print(msg.__dict__)
 
-    #async def my_self(self) -> ContactSelf:
-    #    """get contact of the bot"""
-    #    my_contact_id = self.puppet.self_id()
-    #    contact = self.ContactSelf.load(my_contact_id)
-    #    await contact.ready()
-    #    return contact
+    async def my_self(self) -> ContactSelf:
+        """get self contact"""
+        my_contact_id = self.bot.puppet.self_id()
+        contact = self.ContactSelf.load(my_contact_id)
+        await contact.ready()
+        return contact
 
     @classmethod
     def split_quote_and_mention(cls, text):
