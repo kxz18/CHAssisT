@@ -4,10 +4,12 @@
 import os
 import sys
 sys.path.append("src")
+from datetime import datetime
 from data.database import Database, PrimaryKey, Field
 
 TABLE = "test_table"
 PATH = "test.db"
+config = 'database_config.pkl'
 
 def test_create():
     """create table"""
@@ -17,7 +19,8 @@ def test_create():
         pass
     database = Database(PATH)
     primary_key = PrimaryKey.id_as_primary()
-    fields = [Field("msg", "TEXT"), Field("tags", "CHAR(50)")]
+    fields = [Field("msg", "TEXT"), Field("tags", "CHAR(50)"),
+              Field('time', 'CHAR(30)', others=[f'DEFAULT (\'{str(datetime.now())}\')'])]
     database.create_table(TABLE, primary_key, fields)
     assert TABLE in database.tables.keys()
     database.close()
@@ -50,3 +53,14 @@ def test_select():
     """test select function"""
     database = Database(PATH)
     assert len(database.select(TABLE, ['id', 'tags'])) == 2
+
+def test_delete_by_time():
+    """test delete by time range"""
+    database = Database(PATH)
+    data_num = len(database.select(TABLE))
+    start = datetime.now()
+    database.insert(TABLE, ["msg", "tags", 'time'],
+                    ["delete by time", "create time", f'{str(datetime.now())}'])
+    end = datetime.now()
+    database.delete_by_time(TABLE, 'time', start, end)
+    assert len(database.select(TABLE)) == data_num
