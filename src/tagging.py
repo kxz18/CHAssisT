@@ -52,6 +52,9 @@ class Tagging(WechatyPlugin):
         if self.tag_controller.handle_msg(quoted, text, from_contact.get_id(), to_bot):
             print('tag controller found reply')
             await conversation.say(self.tag_controller.get_reply())
+        elif self.question_answering.handle_msg(text, to_bot):
+            print('question answering found reply')
+            await conversation.say(self.question_answering.get_reply())
         print(msg.__dict__)
 
     async def my_self(self) -> ContactSelf:
