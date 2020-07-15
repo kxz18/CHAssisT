@@ -74,3 +74,12 @@ def test_update():
     assert len(all_msg) == data_num
     assert all_msg[-1][1].msg == 'update message'
     assert all_msg[-1][1].tags == 'test update 2'
+
+def test_get_msgs_by_time_range():
+    """test get msgs by time range"""
+    interface = DataTransfer(Database(PATH))
+    start = datetime.now() + timedelta(days=10)
+    end = start + timedelta(days=20)
+    for i in range(10):
+        test_save_msg(time=start + timedelta(days=i))
+    assert len(interface.get_msgs_by_time_range(start, end)) == 10
