@@ -4,7 +4,7 @@
 from typing import Optional
 from datetime import datetime
 import re
-from dateutil import parse
+from dateutil.parser import parse
 
 from data.data_transfer import DataTransfer
 
