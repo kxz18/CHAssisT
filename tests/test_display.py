@@ -28,7 +28,7 @@ def init_data():
             pass
     interface = DataTransfer(Database(PATH, CONFIG))
     for quoted, tag, in MSG_CONTENTS:
-        msg = MsgWithTag(quoted, tag, 'me', time=datetime.now())     # talker is not important here
+        msg = MsgWithTag(quoted, tag, 'me', create_time=datetime.now())     # talker is not important here
         interface.save_msg(msg)
     interface.save()
     return interface
@@ -44,5 +44,5 @@ def test_display_msg():
     assert len(display.reply.split('\n')) == len(MSG_CONTENTS)
     assert display.handle_msg(f'{KEY_DISPLAY}{KEY_SPLIT}'
                               f'{start.year}.{start.month}.{start.day}'
-                              f'-{end.year}.{end.month}.{end.day}')
+                              f'-{end.year}.{end.month}.{end.day}', True)
     assert len(display.reply.split('\n')) == len(MSG_CONTENTS)

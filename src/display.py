@@ -44,7 +44,7 @@ class Display:
         """display msgs, pattern is like:
         display(key):(split) year.month.day - year.month.day"""
         revised_text = re.sub(r'\s+', '', text)
-        no_time_pattern = re.compile(r'^' + KEY_SPLIT + r'$')
+        no_time_pattern = re.compile(r'^' + KEY_DISPLAY + r'$')
         res = no_time_pattern.match(revised_text)
         if res is not None:     # matched
             self.reply = self.display_msgs_by_time_range(None, None)
