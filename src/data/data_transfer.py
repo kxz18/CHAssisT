@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding:utf-8 -*-
 """interface between msg with tags and database"""
+from typing import Optional
 from datetime import datetime
 from data.database import Database, PrimaryKey
 from data.msg_with_tag import MsgWithTag
@@ -89,6 +90,15 @@ class DataTransfer:
         if len(msg_data) != 0:
             return (msg_data[0][0], self.data_to_msg(msg_data[0]))
         return None
+
+    def get_msgs_by_time_range(self, start: Optional[datetime], end: Optional[datetime]):
+        """get messages in time range
+        params:
+            start: start point of time range, can be None
+            end: end point of time range, can be None"""
+        data = self.database.search_by_range(self.tname, MsgWithTag.get_time_key(),
+                                             start, end)
+        return [(item[0], self.data_to_msg(item)) for item in data]
 
     def get_all_msgs(self):
         """return all stored tagged messages
