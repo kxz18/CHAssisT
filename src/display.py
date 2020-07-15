@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 """ddfination of class display"""
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, timedelta
 import re
 from dateutil.parser import parse
 
@@ -38,7 +38,7 @@ class Display:
             start: start of time span, can be None, which means no restrict
             end: end of time span, can be None"""
         msgs_in_time_range = self.interface.get_msgs_by_time_range(start, end)
-        return '\n'.join([msg.to_str() for msg in msgs_in_time_range])
+        return '\n'.join([msg.to_str() for _, msg in msgs_in_time_range])
 
     def handle_display_msgs(self, text):
         """display msgs, pattern is like:
@@ -53,7 +53,9 @@ class Display:
                                        r'(\d+\.\d+\.\d+)-(\d+\.\d+\.\d+)$')
         res = with_time_pattern.match(revised_text)
         if res is not None:
-            self.reply = self.display_msgs_by_time_range(parse(res.group(1)),
-                                                         parse(res.group(2)))
+            start = parse(res.group(1))
+            # as 2020.7.20 includes messages from 2020.7.20 0:0 to 23:59
+            end = parse(res.group(2)) + timedelta(days=1) - timedelta(seconds=1)
+            self.reply = self.display_msgs_by_time_range(start, end)
             return True
         return False
