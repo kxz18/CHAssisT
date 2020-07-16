@@ -113,7 +113,7 @@ class TagController:
             params[key] = res.group(idx + 1)
         self.scheduler.add_job(self.interface.del_msg_by_timedelta, 'cron',
                                year=params['year'], month=params['month'],
-                               day=params['day'], day_of_week=['week day'],
+                               day=params['day'], day_of_week=params['week day'],
                                hour=params['hour'], minute=params['minute'],
                                args=[timedelta(days=int(res.group(7)))],
                                id=self.job_id)
