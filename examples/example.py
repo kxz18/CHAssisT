@@ -2,17 +2,14 @@
 # -*- coding:utf-8 -*-
 """example of group assistant bot"""
 # pylint: disable=R0801
-import sys
-sys.path.append('../src')
 import asyncio
 import logging
 from typing import Optional, Union
-
+import sys
 from wechaty_puppet import FileBox, ScanStatus  # type: ignore
-
 from wechaty import Wechaty, Contact
 from wechaty.user import Message, Room
-
+sys.path.append('../src')
 from tagging import Tagging
 
 logging.basicConfig(level=logging.INFO)
@@ -60,7 +57,7 @@ bot: Optional[MyBot] = None
 
 async def main():
     """doc"""
-    # pylint: disable=W0603
+    # pylint: disable=W0603, C0103
     global bot
     bot = MyBot()
     bot.use([Tagging()])

@@ -184,6 +184,7 @@ class Database:
                        f'where {key}={table.revise_data(key, value)}')
         return cursor.fetchall()
 
+    # pylint: disable=R0913
     def search_by_range(self, tname, key, start=None, end=None, columns=None):
         """search by value range
         params:
