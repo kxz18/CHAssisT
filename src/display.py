@@ -18,6 +18,10 @@ class Display:
             interface: interface of database"""
         self.interface = interface
         self.reply = ''
+    
+    def get_reply(self):
+        """return reply message"""
+        return self.reply
 
     def handle_msg(self, text, to_bot):
         """deal with display command
