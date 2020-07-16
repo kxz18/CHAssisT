@@ -15,6 +15,7 @@ from data.data_transfer import DataTransfer
 from question_answering import QuestionAnswering
 from tag_controller import TagController
 from display import Display
+from help import Help
 
 class Tagging(WechatyPlugin):
     """tagging system plugin for bot"""
@@ -34,6 +35,7 @@ class Tagging(WechatyPlugin):
         self.question_answering = QuestionAnswering(self.interface)
         self.tag_controller = TagController(self.interface)
         self.display = Display(self.interface)
+        self.help = Help()
         self.contact = self.my_self()
 
     async def on_message(self, msg: Message):
@@ -60,6 +62,9 @@ class Tagging(WechatyPlugin):
         elif self.display.handle_msg(text, to_bot):
             print('display found reply')
             await conversation.say(self.display.get_reply())
+        elif self.help.handle_msg(text, to_bot):
+            print('help system found reply')
+            await conversation.say(self.help.get_reply())
         print(msg.__dict__)
 
     async def my_self(self) -> ContactSelf:

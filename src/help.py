@@ -3,12 +3,20 @@
 """defination of help system"""
 import re
 import tag_controller
+import display
 KEY_HELP = 'help'
 KEY_SPLIT = '#'
 
 class Help:
     """help info system"""
-    help_dict = {}
+    help_dict = {
+                'save': save_msg(),
+                'delete': delete_msg(),
+                'timed delete': timed_delete(),
+                'display': display_msg(),
+                'question': question_answering()
+                }
+
     def __init__(self):
         """init"""
         # keyword-content dictionary
@@ -19,18 +27,22 @@ class Help:
             return False
         self.reply = ''
         revised_text = re.sub(r'\s+', '', text)
-        if revised_text == KEY_HELP:
+        if revised_text == KEY_HELP:    # display navigation help info
             self.reply = self.all()
             return True
         pattern = re.compile(r'^' + KEY_HELP + KEY_SPLIT + r'(.*?)$')
         res = pattern.match(revised_text)
         if res is not None:
-            if res.group(1) in self.help_dict.keys():
+            if res.group(1) in self.help_dict.keys():   # found keyword
                 self.reply = self.help_dict[res.group(1)]
             else:
                 self.reply = self.no_such_method()
             return True
         return False
+
+    def get_reply(self):
+        """return reply"""
+        return self.reply
 
     @classmethod
     def all(cls):
@@ -68,3 +80,20 @@ class Help:
                '*-*-*-*-22-0-1 means delete messages 1 days before on 22:00 daily.\n'\
                'To stop it, say to the bot like:\n'\
                f'{tag_controller.KEY_DELETE}{tag_controller.KEY_SPLIT}{tag_controller.KEY_STOP}'
+
+    @classmethod
+    def display_msg(cls):
+        """return help for displaying"""
+        return 'To display all saved messages, say to the bot like:\n'\
+               f'{display.KEY_DISPLAY}\n'\
+               'To display saved messages within a time range:\n'\
+               f'{display.KEY_DISPLAY}{display.KEY_SPLIT}'\
+               'year.month.day - year.month.day\n'\
+               f'e.g. {display.KEY_DISPLAY}{display.KEY_SPLIT}'\
+               '2020.7.20 - 2020.7.22 means display all messages'\
+               'between 2020.7.20 and 2020.7.22'
+
+    @classmethod
+    def question_answering(cls):
+        """return help for question answering"""
+        return 'To ask for saved messages, just ask the bot what you want to know'
