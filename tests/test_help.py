@@ -14,9 +14,9 @@ def test_help_all():
 
 def test_help_individual():
     """test doc of individual function"""
-    for key in HELP.dict_help:
+    for key in HELP.help_dict():
         assert HELP.handle_msg(f'{KEY_HELP} {KEY_SPLIT}{key}', True)
-        assert HELP.get_reply() == HELP.dict_help(key)
+        assert HELP.get_reply() == HELP.help_dict()[key]
 
     false_keyword = 'no such key word'
     assert HELP.handle_msg(f'{KEY_HELP}{KEY_SPLIT}{false_keyword}', True)

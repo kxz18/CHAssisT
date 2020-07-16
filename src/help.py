@@ -9,17 +9,8 @@ KEY_SPLIT = '#'
 
 class Help:
     """help info system"""
-    help_dict = {
-                'save': save_msg(),
-                'delete': delete_msg(),
-                'timed delete': timed_delete(),
-                'display': display_msg(),
-                'question': question_answering()
-                }
-
     def __init__(self):
         """init"""
-        # keyword-content dictionary
         self.reply = ''
     def handle_msg(self, text, to_bot):
         """handle help command"""
@@ -33,8 +24,8 @@ class Help:
         pattern = re.compile(r'^' + KEY_HELP + KEY_SPLIT + r'(.*?)$')
         res = pattern.match(revised_text)
         if res is not None:
-            if res.group(1) in self.help_dict.keys():   # found keyword
-                self.reply = self.help_dict[res.group(1)]
+            if res.group(1) in self.help_dict().keys():   # found keyword
+                self.reply = self.help_dict()[res.group(1)]
             else:
                 self.reply = self.no_such_method()
             return True
@@ -45,9 +36,21 @@ class Help:
         return self.reply
 
     @classmethod
+    def help_dict(cls):
+        """return dictionary of keyword of functions"""
+        help_dict = {
+                    'save': cls.save_msg(),
+                    'delete': cls.delete_msg(),
+                    'timed-delete': cls.timed_delete(),
+                    'display': cls.display_msg(),
+                    'question': cls.question_answering()
+                    }
+        return help_dict
+
+    @classmethod
     def all(cls):
         """all help information"""
-        help_keywords = '\n'.join([f'- {key}' for key in cls.help_dict])
+        help_keywords = '\n'.join([f'- {key}' for key in cls.help_dict()])
         return 'To get help of certain keywords, type commands like:'\
                f'{KEY_HELP}{KEY_SPLIT}function keywords\n'\
                f'all function keywords are as follows:\n{help_keywords}'
