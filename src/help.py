@@ -63,7 +63,10 @@ class Help:
     @classmethod
     def save_msg(cls):
         """help doc for save tagged message"""
-        return 'To tag a message, quote it and say the tag to the bot'
+        return 'To tag a message, quote it and say the tag to the bot.'\
+               'If you want to add expiry date to it, append '\
+               f'{tag_controller.KEY_EXPIRY}{tag_controller.KEY_SPLIT}'\
+               f'year-month-day (hour:minute:second)'
 
     @classmethod
     def delete_msg(cls):
