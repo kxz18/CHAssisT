@@ -3,6 +3,8 @@
 import os
 import sys
 sys.path.append("src")
+from time import sleep
+from datetime import datetime, timedelta
 from tag_controller import TagController, KEY_DELETE, KEY_SPLIT, KEY_EXPIRY, KEY_STOP
 from data.database import Database
 from data.data_transfer import DataTransfer
@@ -29,24 +31,45 @@ def test_not_reply():
 
 def test_save_msg():
     """test save messaga"""
-    controller = TagController(DataTransfer(Database(PATH)))
+    interface = DataTransfer(Database(PATH))
+    controller = TagController(interface)
     ifreply = controller.handle_msg(quoted='first', msg='test save msg',
                                   talker='me', to_bot=True)
     assert ifreply
     assert controller.reply == reply.save_msg_success()
+    assert len(interface.get_all_msgs()) == 1
+
+def test_expiry():
+    """test expiry of messages"""
+    interface = DataTransfer(Database(PATH))
+    controller = TagController(interface)
+    data_num = len(interface.get_all_msgs())
+    expiry = datetime.now() + timedelta(seconds=1)
+    msg = f'test expiry, {KEY_EXPIRY}{KEY_SPLIT}{str(expiry)}'
+    controller.handle_msg(quoted='first', msg=msg,
+                          talker='me', to_bot=True)
+    sleep(1)
+    assert data_num == len(interface.get_all_msgs())
 
 def test_delete():
     """test delete message"""
-    controller = TagController(DataTransfer(Database(PATH)))
+    interface = DataTransfer(Database(PATH))
+    controller = TagController(interface)
+    data_num = len(interface.get_all_msgs())
     ifreply = controller.handle_msg(quoted=None, msg=f'{KEY_DELETE} {KEY_SPLIT}1',
                                     talker='me', to_bot=True)
     assert ifreply
     assert controller.reply == reply.del_msg_success(1)
+    assert len(interface.get_all_msgs()) == data_num - 1
 
 def test_timed_delete():
     """test timed delete"""
     controller = TagController(DataTransfer(Database(PATH)))
     ifreply = controller.handle_msg(quoted=None, msg=f'{KEY_DELETE} {KEY_SPLIT}*-*-*-2-0-0-1',
+                                    talker='me', to_bot=True)
+    assert ifreply
+    # substitute former plan
+    ifreply = controller.handle_msg(quoted=None, msg=f'{KEY_DELETE} {KEY_SPLIT}*-*-*-*-*-*-1',
                                     talker='me', to_bot=True)
     assert ifreply
 
