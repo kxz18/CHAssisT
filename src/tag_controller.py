@@ -12,6 +12,7 @@ import reply
 
 KEY_EXPIRY = 'expiry'
 KEY_DELETE = 'delete'
+KEY_STOP = 'stop'
 KEY_SPLIT = r'#'
 
 class TagController:
@@ -22,6 +23,7 @@ class TagController:
         self.interface = interface
         self.reply = ''  # during handling, help or reply messages may be needed
         self.scheduler = BackgroundScheduler()
+        self.job_id = 'timed delete'
         self.scheduler.start()
 
     def handle_msg(self, quoted, msg, talker, to_bot):
@@ -46,6 +48,9 @@ class TagController:
             return True
         # timed delete
         if self.handle_timed_delete(msg):
+            return True
+        # stop timed delete
+        if self.handle_stop_timed_delete(msg):
             return True
         return False
 
@@ -82,7 +87,7 @@ class TagController:
     def handle_delete(self, msg):
         """handle delete command"""
         # pattern is like 'delete#123'
-        pattern = re.compile(KEY_DELETE + KEY_SPLIT + r'(\d+)$')
+        pattern = re.compile(r'^' + KEY_DELETE + KEY_SPLIT + r'(\d+)$')
         res = pattern.match(re.sub(r'\s+', '', msg))    # get rid of spaces
         if res is None:
             return False
@@ -93,19 +98,37 @@ class TagController:
 
     def handle_timed_delete(self, msg: str):
         """generate timed deleting task"""
-        # pattern is like 'timed delete#y-m-d-dof-h-min-x'
+        # pattern is like 'delete#y-m-d-dof-h-min-x'
         # data which are x days before will be deleted
-        pattern = re.compile(KEY_DELETE + KEY_SPLIT +
+        pattern = re.compile(r'^' + KEY_DELETE + KEY_SPLIT +
                              '-'.join([r'(\d+|\*)' for _ in range(7)]))
         res = pattern.match(re.sub(r'\s+', '', msg))
         if res is None:
             return False
+        ids = [job.id for job in self.scheduler.get_jobs()]
+        if self.job_id in ids:   # remove former job
+            self.scheduler.remove_job(self.job_id)
+        params = {}
+        for idx, key in enumerate(['year', 'month', 'day', 'week day', 'hour', 'minute']):
+            params[key] = res.group(idx + 1)
         self.scheduler.add_job(self.interface.del_msg_by_timedelta, 'cron',
-                               year=res.group(1), month=res.group(2),
-                               day=res.group(3), day_of_week=res.group(4),
-                               hour=res.group(5), minute=res.group(6),
-                               args=[timedelta(days=int(res.group(7)))])
+                               year=params['year'], month=params['month'],
+                               day=params['day'], day_of_week=params['week day'],
+                               hour=params['hour'], minute=params['minute'],
+                               args=[timedelta(days=int(res.group(7)))],
+                               id=self.job_id)
+        self.reply = reply.set_timed_delete_success(params, int(res.group(7)))
         return True
 
     def handle_stop_timed_delete(self, msg: str):
         """stop timed delete task"""
+        # pattern is like 'delete#stop'
+        if re.sub(r'\s+', '', msg) == f'{KEY_DELETE}{KEY_SPLIT}{KEY_STOP}':
+            ids = [job.id for job in self.scheduler.get_jobs()]
+            if self.job_id in ids:   # remove
+                self.scheduler.remove_job(self.job_id)
+                self.reply = reply.stop_timed_delete(True)
+            else:
+                self.reply = reply.stop_timed_delete(False)
+            return True
+        return False
