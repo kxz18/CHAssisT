@@ -3,7 +3,7 @@
 import os
 import sys
 sys.path.append("src")
-from tag_controller import TagController, KEY_DELETE, KEY_SPLIT, KEY_EXPIRY
+from tag_controller import TagController, KEY_DELETE, KEY_SPLIT, KEY_EXPIRY, KEY_STOP
 from data.database import Database
 from data.data_transfer import DataTransfer
 import reply
@@ -49,3 +49,17 @@ def test_timed_delete():
     ifreply = controller.handle_msg(quoted=None, msg=f'{KEY_DELETE} {KEY_SPLIT}*-*-*-2-0-0-1',
                                     talker='me', to_bot=True)
     assert ifreply
+
+def test_stop_timed_delete():
+    """test stop timed delete task"""
+    controller = TagController(DataTransfer(Database(PATH)))
+    controller.handle_msg(quoted=None, msg=f'{KEY_DELETE} {KEY_SPLIT}*-*-*-2-0-0-1',
+                          talker='me', to_bot=True)
+    ifreply = controller.handle_msg(quoted=None, msg=f'{KEY_DELETE}{KEY_SPLIT}{KEY_STOP}',
+                                    talker='me', to_bot=True)
+    assert ifreply
+    assert controller.reply == reply.stop_timed_delete(True)
+    ifreply = controller.handle_msg(quoted=None, msg=f'{KEY_DELETE}{KEY_SPLIT}{KEY_STOP}',
+                                    talker='me', to_bot=True)
+    assert ifreply
+    assert controller.reply == reply.stop_timed_delete(False)
