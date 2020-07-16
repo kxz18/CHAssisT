@@ -10,6 +10,10 @@ def del_msg_success(_id):
     """successfully deleted a message"""
     return f'Deleted #{_id}'
 
+def parse_expiry_error():
+    """given expiry date with wrong format"""
+    return 'Expiry format error, consult the help doc for format'
+
 def set_timed_delete_success(params, delta):
     """successfully set timed delete job
     params:

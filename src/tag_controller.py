@@ -70,7 +70,8 @@ class TagController:
             try:
                 expiry = parse(date_str)
             except Exception:   # here help doc may be needed
-                expiry = None
+                self.reply = reply.parse_expiry_error()
+                return True
         else: # no expiry
             content = msg
             expiry = None
