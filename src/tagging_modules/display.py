@@ -11,6 +11,7 @@ from data.data_transfer import DataTransfer
 KEY_DISPLAY = 'display'
 KEY_SPLIT = r'#'
 
+
 class Display:
     """handle display command"""
     def __init__(self, interface: DataTransfer):
@@ -18,7 +19,7 @@ class Display:
             interface: interface of database"""
         self.interface = interface
         self.reply = ''
-    
+
     def get_reply(self):
         """return reply message"""
         return self.reply
@@ -53,8 +54,8 @@ class Display:
         if res is not None:     # matched
             self.reply = self.display_msgs_by_time_range(None, None)
             return True
-        with_time_pattern = re.compile(r'^' + KEY_DISPLAY + KEY_SPLIT +
-                                       r'(\d+\.\d+\.\d+)-(\d+\.\d+\.\d+)$')
+        with_time_pattern = re.compile(r'^' + KEY_DISPLAY + KEY_SPLIT
+                                       + r'(\d+\.\d+\.\d+)-(\d+\.\d+\.\d+)$')
         res = with_time_pattern.match(revised_text)
         if res is not None:
             start = parse(res.group(1))

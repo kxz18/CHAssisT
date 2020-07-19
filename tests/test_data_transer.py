@@ -2,8 +2,6 @@
 # -*- coding:utf-8 -*-
 """test data transfer"""
 import os
-import sys
-sys.path.append('src')
 from datetime import datetime, timedelta
 from data.data_transfer import DataTransfer
 from data.database import Database

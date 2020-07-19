@@ -5,12 +5,10 @@
 import asyncio
 import logging
 from typing import Optional, Union
-import sys
 from wechaty_puppet import FileBox, ScanStatus  # type: ignore
 from wechaty import Wechaty, Contact
 from wechaty.user import Message, Room
-sys.path.append('../src')
-from tagging import Tagging
+from tagging_plugin import Tagging
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)

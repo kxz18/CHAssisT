@@ -1,13 +1,11 @@
 #!/usr/bin/python
 # -*- coding:utf-8 -*-
 import os
-import sys
-sys.path.append("src")
 from data.database import Database
 from data.data_transfer import DataTransfer
 from data.msg_with_tag import MsgWithTag
-import reply
-from question_answering import QuestionAnswering
+from tagging_modules import reply
+from tagging_modules.question_answering import QuestionAnswering
 
 PATH = "test.db"
 CONFIG = 'database_config.pkl'

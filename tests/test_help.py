@@ -1,9 +1,7 @@
 #!/usr/bin/python
 # -*- coding:utf-8 -*-
 """unit test for help system"""
-import sys
-sys.path.append("src")
-from help import Help, KEY_HELP, KEY_SPLIT
+from tagging_modules.help import Help, KEY_HELP, KEY_SPLIT
 
 HELP = Help()
 

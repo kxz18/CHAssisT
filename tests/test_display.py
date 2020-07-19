@@ -2,13 +2,11 @@
 # -*- coding:utf-8 -*-
 from datetime import datetime
 import os
-import sys
-sys.path.append("src")
-from display import Display, KEY_DISPLAY, KEY_SPLIT
+from tagging_modules.display import Display, KEY_DISPLAY, KEY_SPLIT
 from data.database import Database
 from data.data_transfer import DataTransfer
 from data.msg_with_tag import MsgWithTag
-import reply
+from tagging_modules import reply
 
 PATH = "test.db"
 CONFIG = 'database_config.pkl'

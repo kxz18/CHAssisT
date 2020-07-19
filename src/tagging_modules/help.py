@@ -2,16 +2,20 @@
 # -*- coding:utf-8 -*-
 """defination of help system"""
 import re
-import tag_controller
-import display
+
+
+from tagging_modules import tag_controller
+from tagging_modules import display
 KEY_HELP = 'help'
 KEY_SPLIT = '#'
+
 
 class Help:
     """help info system"""
     def __init__(self):
         """init"""
         self.reply = ''
+
     def handle_msg(self, text, to_bot):
         """handle help command"""
         if not to_bot:
@@ -39,12 +43,12 @@ class Help:
     def help_dict(cls):
         """return dictionary of keyword of functions"""
         help_dict = {
-                    'save': cls.save_msg(),
-                    'delete': cls.delete_msg(),
-                    'timed-delete': cls.timed_delete(),
-                    'display': cls.display_msg(),
-                    'question': cls.question_answering()
-                    }
+            'save': cls.save_msg(),
+            'delete': cls.delete_msg(),
+            'timed-delete': cls.timed_delete(),
+            'display': cls.display_msg(),
+            'question': cls.question_answering()
+        }
         return help_dict
 
     @classmethod

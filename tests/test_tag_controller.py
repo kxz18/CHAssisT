@@ -1,14 +1,12 @@
 #!/usr/bin/python
 # -*- coding:utf-8 -*-
 import os
-import sys
-sys.path.append("src")
 from time import sleep
 from datetime import datetime, timedelta
-from tag_controller import TagController, KEY_DELETE, KEY_SPLIT, KEY_EXPIRY, KEY_STOP
+from tagging_modules.tag_controller import TagController, KEY_DELETE, KEY_SPLIT, KEY_EXPIRY, KEY_STOP
 from data.database import Database
 from data.data_transfer import DataTransfer
-import reply
+from tagging_modules import reply
 
 PATH = "test.db"
 CONFIG = 'database_config.pkl'

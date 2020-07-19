@@ -4,16 +4,18 @@
 import re
 from datetime import timedelta
 from dateutil.parser import parse
+from dateutil.parser._parser import ParserError
 from apscheduler.schedulers.background import BackgroundScheduler
 from data.data_transfer import DataTransfer
 from data.msg_with_tag import MsgWithTag
-from question_answering import QuestionAnswering
-import reply
+from tagging_modules.question_answering import QuestionAnswering
+from tagging_modules import reply
 
 KEY_EXPIRY = 'expiry'
 KEY_DELETE = 'delete'
 KEY_STOP = 'stop'
 KEY_SPLIT = r'#'
+
 
 class TagController:
     """handle commands of saving and deleting stored messages"""
@@ -69,10 +71,10 @@ class TagController:
             date_str = splited[-1].strip()  # clear spaces at head and tail
             try:
                 expiry = parse(date_str)
-            except Exception:   # here help doc may be needed
+            except ParserError:   # here help doc may be needed
                 self.reply = reply.parse_expiry_error()
                 return True
-        else: # no expiry
+        else:    # no expiry
             content = msg
             expiry = None
         tags = QuestionAnswering.get_tags_from_msg(content)
@@ -101,8 +103,8 @@ class TagController:
         """generate timed deleting task"""
         # pattern is like 'delete#y-m-d-dof-h-min-x'
         # data which are x days before will be deleted
-        pattern = re.compile(r'^' + KEY_DELETE + KEY_SPLIT +
-                             '-'.join([r'(\d+|\*)' for _ in range(7)]))
+        pattern = re.compile(r'^' + KEY_DELETE + KEY_SPLIT
+                             + '-'.join([r'(\d+|\*)' for _ in range(7)]))
         res = pattern.match(re.sub(r'\s+', '', msg))
         if res is None:
             return False

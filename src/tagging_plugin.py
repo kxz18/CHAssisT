@@ -12,10 +12,10 @@ from wechaty.user.contact_self import ContactSelf
 
 from data.database import Database
 from data.data_transfer import DataTransfer
-from question_answering import QuestionAnswering
-from tag_controller import TagController
-from display import Display
-from help import Help
+from tagging_modules.question_answering import QuestionAnswering
+from tagging_modules.tag_controller import TagController
+from tagging_modules.display import Display
+from tagging_modules.help import Help
 
 class Tagging(WechatyPlugin):
     """tagging system plugin for bot"""
@@ -36,18 +36,18 @@ class Tagging(WechatyPlugin):
         self.tag_controller = TagController(self.interface)
         self.display = Display(self.interface)
         self.help = Help()
-        self.contact = self.my_self()
 
     async def on_message(self, msg: Message):
         """listen message event"""
         #with open("test_message.pkl", 'wb') as fout:
         #    pickle.dump(msg, fout)
+        self_contact = await self.my_self()
         from_contact = msg.talker()
         quoted, text, mention = self.split_quote_and_mention(msg.text())
         room = msg.room()
-        to_bot = self.contact.contact_id in msg.payload.mention_ids or\
-                 self.contact.contact_id == msg.payload.to_id or\
-                 self.contact.name() == mention
+        to_bot = self_contact.contact_id in msg.payload.mention_ids or\
+                 self_contact.contact_id == msg.payload.to_id or\
+                 self_contact.name() == mention
         conversation: Union[
             Room, Contact] = from_contact if room is None else room
         await conversation.ready()
