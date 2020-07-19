@@ -10,7 +10,7 @@ SOURCE_GLOB=$(wildcard bin/*.py src/**/*.py tests/**/*.py examples/*.py)
 # Huan(202003)
 # 	F811: https://github.com/PyCQA/pyflakes/issues/320#issuecomment-469337000
 #
-IGNORE_PEP=E203,E221,E241,E272,E501,F811
+IGNORE_PEP=E203,E221,E241,E272,E501,F811,W503
 
 # help scripts to find the right place of wechaty module
 export PYTHONPATH=src/
@@ -51,7 +51,8 @@ flake8:
 .PHONY: mypy
 mypy:
 	MYPYPATH=stubs/ mypy \
-		$(SOURCE_GLOB)
+		$(SOURCE_GLOB) \
+		--ignore-missing-imports
 
 .PHONY: pytype
 pytype:
@@ -66,6 +67,8 @@ install:
 .PHONY: pytest
 pytest:
 	pytest src/ tests/
+	rm *.pkl
+	rm *.db
 
 .PHONY: test-unit
 test-unit: pytest
@@ -94,7 +97,7 @@ publish:
 
 .PHONY: bot
 bot:
-	python3 examples/ding-dong-bot.py
+	python3 examples/example.py
 
 #.PHONY: version
 #version:
