@@ -51,7 +51,7 @@ class TaskController:
             return True
         return False
 
-    def date_type_task(self, msg:str, conversation: Union[Contact, Room]):
+    def date_type_task(self, msg: str, conversation: Union[Contact, Room]):
         """parse date type timed task
         pattern is like: timed message#y-m-d h:min:sec-msg"""
         pattern = re.compile(r'^\s+' + KEY_TIMED_TASK + r'\s+' + KEY_SPLIT
@@ -65,7 +65,6 @@ class TaskController:
                                args=[res.group(2)])
         self.reply = reply.set_date_timed_task_success(res.group(1), res.group(2))
         return True
-
 
     def cron_type_task(self, msg: str, conversation: Union[Contact, Room]):
         """parse cron type timed task

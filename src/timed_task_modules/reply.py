@@ -15,6 +15,7 @@ def set_cron_timed_task_success(params, message):
             time_point += f'{key} {params[key]}'
     return f'message {message} will be sent on every {time_point}'
 
+
 def set_date_timed_task_success(date, message):
     """successfully set date type timed task
     params:
