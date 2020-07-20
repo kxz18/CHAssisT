@@ -3,7 +3,7 @@
 """handle commands of timed task"""
 import re
 from typing import Union
-from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from wechaty import Contact
 from wechaty.user import Room
 from timed_task_modules import reply
@@ -19,7 +19,7 @@ class TaskController:
             scheduler: job scheduler
             reply: reply to user command"""
         self.reply = ''  # during handling, help or reply messages may be needed
-        self.scheduler = BackgroundScheduler()
+        self.scheduler = AsyncIOScheduler()
         self.id_count = 0
         self.scheduler.start()
 
@@ -37,6 +37,7 @@ class TaskController:
             return False
         if self.handle_create_task(msg, conversation):
             return True
+        return False
 
     def get_reply(self):
         """return reply"""
