@@ -4,8 +4,8 @@
 
 
 # TaskController
-def set_timed_task_success(params, message):
-    """successfully set timed delete job
+def set_cron_timed_task_success(params, message):
+    """successfully set cron type timed task
     params:
         params: dictionary of time parameters of the job
         message: message which is to be sent"""
@@ -13,4 +13,12 @@ def set_timed_task_success(params, message):
     for key in params:
         if params[key] != '*':
             time_point += f'{key} {params[key]}'
-    return f'message {message} will be sent on {time_point}'
+    return f'message {message} will be sent on every {time_point}'
+
+
+def set_date_timed_task_success(date, message):
+    """successfully set date type timed task
+    params:
+        date: date to sent
+        message: message to be sent"""
+    return f'message {message} will be sent on {date}'
