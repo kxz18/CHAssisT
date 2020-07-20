@@ -2,8 +2,6 @@
 # -*- coding:utf-8 -*-
 """test database class"""
 import os
-import sys
-sys.path.append("src")
 from datetime import datetime
 from data.database import Database, PrimaryKey, Field
 

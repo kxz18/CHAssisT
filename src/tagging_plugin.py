@@ -6,13 +6,16 @@ import re
 from typing import Union
 import pickle
 
-from wechaty import Message, Contact, Room, ContactSelf
+from wechaty import Message, Contact, Room
 from wechaty.plugin import WechatyPlugin
+from wechaty.user.contact_self import ContactSelf
 
 from data.database import Database
 from data.data_transfer import DataTransfer
-from question_answering import QuestionAnswering
-from tag_controller import TagController
+from tagging_modules.question_answering import QuestionAnswering
+from tagging_modules.tag_controller import TagController
+from tagging_modules.display import Display
+from tagging_modules.help import Help
 
 class Tagging(WechatyPlugin):
     """tagging system plugin for bot"""
@@ -31,18 +34,20 @@ class Tagging(WechatyPlugin):
         self.interface = DataTransfer(Database(data_path, config_path))
         self.question_answering = QuestionAnswering(self.interface)
         self.tag_controller = TagController(self.interface)
-        self.contact = self.my_self()
+        self.display = Display(self.interface)
+        self.help = Help()
 
     async def on_message(self, msg: Message):
         """listen message event"""
         #with open("test_message.pkl", 'wb') as fout:
         #    pickle.dump(msg, fout)
+        self_contact = await self.my_self()
         from_contact = msg.talker()
         quoted, text, mention = self.split_quote_and_mention(msg.text())
         room = msg.room()
-        to_bot = self.contact.contact_id in msg.payload.mention_ids or\
-                 self.contact.contact_id == msg.payload.to_id or\
-                 self.contact.name() == mention
+        to_bot = self_contact.contact_id in msg.payload.mention_ids or\
+                 self_contact.contact_id == msg.payload.to_id or\
+                 self_contact.name() == mention
         conversation: Union[
             Room, Contact] = from_contact if room is None else room
         await conversation.ready()
@@ -51,6 +56,15 @@ class Tagging(WechatyPlugin):
         if self.tag_controller.handle_msg(quoted, text, from_contact.get_id(), to_bot):
             print('tag controller found reply')
             await conversation.say(self.tag_controller.get_reply())
+        elif self.question_answering.handle_msg(text, to_bot):
+            print('question answering found reply')
+            await conversation.say(self.question_answering.get_reply())
+        elif self.display.handle_msg(text, to_bot):
+            print('display found reply')
+            await conversation.say(self.display.get_reply())
+        elif self.help.handle_msg(text, to_bot):
+            print('help system found reply')
+            await conversation.say(self.help.get_reply())
         print(msg.__dict__)
 
     async def my_self(self) -> ContactSelf:

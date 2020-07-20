@@ -21,6 +21,12 @@ class MsgWithTag:
         self.expiry = expiry
         self.time = datetime.now() if create_time is None else create_time
 
+    def to_str(self):
+        """transform self to string"""
+        expiry_str = '' if self.expiry is None\
+                     else f' expiry: {str(self.expiry)}'
+        return f'{self.msg} tags: {self.tags}' + expiry_str
+
     @classmethod
     def from_dict(cls, data):
         """create instance from dictionary

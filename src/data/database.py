@@ -184,6 +184,34 @@ class Database:
                        f'where {key}={table.revise_data(key, value)}')
         return cursor.fetchall()
 
+    # pylint: disable=R0913
+    def search_by_range(self, tname, key, start=None, end=None, columns=None):
+        """search by value range
+        params:
+            tname: name of table
+            key: name of field
+            start: left value of the field
+            end: right value of the field
+            columns: selected columns"""
+        # initialize columns
+        if columns is None:
+            columns = ['*']
+        table = self.tables[tname]
+        cursor = self.conn.cursor()
+        start_condition = f'{key}>={table.revise_data(key, str(start))}'
+        end_condition = f'{key}<={table.revise_data(key, str(end))}'
+        select_cmd = f'SELECT {",".join(columns)} from {tname}'
+        if start is None:
+            # delete until end
+            cursor.execute(select_cmd + f' where {end_condition};')
+        elif end is None:
+            # delete from start
+            cursor.execute(select_cmd + f' where {start_condition};')
+        else:
+            # delete in range(start, end)
+            cursor.execute(select_cmd + f' where {start_condition} and {end_condition};')
+        return cursor.fetchall()
+
     # pylint:disable=R0913
     def update(self, tname, keys, values, key=None, value=None):
         """update values of selected rows
