@@ -9,6 +9,7 @@ from wechaty_puppet import FileBox, ScanStatus  # type: ignore
 from wechaty import Wechaty, Contact
 from wechaty.user import Message, Room
 from tagging_plugin import Tagging
+from timed_task_plugin import TimedTask
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
@@ -58,7 +59,7 @@ async def main():
     # pylint: disable=W0603, C0103
     global bot
     bot = MyBot()
-    bot.use([Tagging()])
+    bot.use([Tagging(), TimedTask()])
     await bot.start()
 
 asyncio.run(main())

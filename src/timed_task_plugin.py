@@ -11,6 +11,7 @@ from wechaty.plugin import WechatyPlugin
 from wechaty.user.contact_self import ContactSelf
 
 from timed_task_modules.task_controller import TaskController
+from timed_task_modules.help import Help
 
 class TimedTask(WechatyPlugin):
     """tagging system plugin for bot"""
@@ -20,11 +21,9 @@ class TimedTask(WechatyPlugin):
         return 'timed task'
 
     def __init__(self):
-        """params:
-            data_path: path of database file,
-            config_path: path of database config file, which
-                         contains auto-created information"""
+        """doc"""
         self.task_controller = TaskController()
+        self.help = Help()
 
     async def on_message(self, msg: Message):
         """listen message event"""
@@ -43,6 +42,10 @@ class TimedTask(WechatyPlugin):
         if self.task_controller.handle_msg(text, conversation, to_bot):
             print('task controller found reply')
             await conversation.say(self.task_controller.get_reply())
+        elif self.help.handle_msg(text, to_bot):
+            print('help of timed task plugin found reply')
+            await conversation.say(self.help.get_reply())
+
         print(msg.__dict__)
 
     async def my_self(self) -> ContactSelf:
