@@ -3,7 +3,7 @@
 """save messages with corresponding tags and answer questions from users,
    display and cleaning function are also provided"""
 import re
-from typing import Union
+from typing import Union, List
 from collections import defaultdict
 from datetime import datetime, timedelta
 
