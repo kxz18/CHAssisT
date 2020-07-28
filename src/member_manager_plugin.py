@@ -38,7 +38,6 @@ class MemberManager(WechatyPlugin):
         conversation: Union[
             Room, Contact] = from_contact if room is None else room
         await conversation.ready()
-        await conversation.say('hey man')
         print(quoted, text, from_contact.get_id(), to_bot)
 
         if isinstance(conversation, Contact):
