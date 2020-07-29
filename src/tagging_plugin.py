@@ -69,7 +69,7 @@ class Tagging(WechatyPlugin):
     async def my_self(self) -> ContactSelf:
         """get self contact"""
         my_contact_id = self.bot.puppet.self_id()
-        contact = self.ContactSelf.load(my_contact_id)
+        contact = ContactSelf.load(my_contact_id)
         await contact.ready()
         return contact
 
