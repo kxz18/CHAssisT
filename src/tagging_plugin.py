@@ -40,11 +40,10 @@ class Tagging(WechatyPlugin):
         self.tag_controller = TagController(self.interface)
         self.display = Display(self.interface)
         self.help = Help()
-        self.contact = None    # get contact-self on login
 
     async def on_message(self, msg: Message):
         """listen message event"""
-        self_contact = self.contact
+        self_contact = await self.my_self()
         from_contact = msg.talker()
         log.info('below are dict of message: ')
         log.info(str(msg.__dict__))
@@ -52,9 +51,9 @@ class Tagging(WechatyPlugin):
         log.info('finish spliting')
         log.info(f'quoted: {quoted}, text: {text}, mention: {mention}')
         room = msg.room()
-        to_bot = self_contact.contact_id in msg.payload.mention_ids or\
-                 self_contact.contact_id == msg.payload.to_id or\
-                 self_contact.name() == mention
+        to_bot = self_contact.get_id() in msg.payload.mention_ids or\
+                 self_contact.get_id() == msg.payload.to_id or\
+                 self_contact.payload.name == mention
         conversation: Union[
             Room, Contact] = from_contact if room is None else room
         await conversation.ready()
@@ -75,17 +74,18 @@ class Tagging(WechatyPlugin):
         except Exception as error:
             log.info(f'something went wrong for tagging plugin: {error}')
 
-    async def my_self(self) -> ContactSelf:
+    async def my_self(self) -> Contact:
         """get self contact"""
-        my_contact_id = self.bot.puppet.self_id()
-        contact = ContactSelf.load(my_contact_id)
+        my_contact_id = self.bot.contact_id
+        contact = Contact.load(my_contact_id)
         await contact.ready()
+        log.info(f'load self contact: {contact}')
         return contact
 
     async def on_login(self, contact: Contact):
         """store contact of self"""
         log.info(f'login as {contact}')
-        self.contact = contact
+        bot_contact = contact
 
     @classmethod
     def split_quote_and_mention(cls, text):
@@ -97,10 +97,9 @@ class Tagging(WechatyPlugin):
     @classmethod
     def split_quote(cls, text):
         """split quoted text and reply from given text,
-        the pattern is like "talker: quoted"\n(several -)\nreply"""
-        pattern = re.compile(r'(.*?)\n' +
-                             ' '.join(['-' for _ in range(15)]) +
-                             r'\n(.*?)$')
+        the pattern is like "talker: quoted"\n(several -)\nreply
+        return: (quoted, text and mentions)"""
+        pattern = re.compile(r'(.*?)\n' + r'[-| ]*' + r'\n(.*?)$')
         res = pattern.match(text)
         if res is None:
             return (None, text)
@@ -110,7 +109,7 @@ class Tagging(WechatyPlugin):
     def split_mention(cls, text):
         """split @sb from given text,
         pattern is like: text @alias"""
-        pattern = re.compile(r'(.*?)\s+@(.*?)$')
+        pattern = re.compile(r'(.*?)\s*@(.*?)(?:\u2005)?$')
         res = pattern.match(text)
         if res is None:
             return (text, None)

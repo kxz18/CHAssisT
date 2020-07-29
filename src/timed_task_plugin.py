@@ -9,9 +9,13 @@ import pickle
 from wechaty import Message, Contact, Room
 from wechaty.plugin import WechatyPlugin
 from wechaty.user.contact_self import ContactSelf
+from wechaty_puppet import get_logger
 
 from timed_task_modules.task_controller import TaskController
 from timed_task_modules.help import Help
+
+log = get_logger('Timed Task Plugin')
+
 
 class TimedTask(WechatyPlugin):
     """tagging system plugin for bot"""
@@ -31,9 +35,9 @@ class TimedTask(WechatyPlugin):
         from_contact = msg.talker()
         quoted, text, mention = self.split_quote_and_mention(msg.text())
         room = msg.room()
-        to_bot = self_contact.contact_id in msg.payload.mention_ids or\
-                 self_contact.contact_id == msg.payload.to_id or\
-                 self_contact.name() == mention
+        to_bot = self_contact.get_id() in msg.payload.mention_ids or\
+                 self_contact.get_id() == msg.payload.to_id or\
+                 self_contact.payload.name == mention
         conversation: Union[
             Room, Contact] = from_contact if room is None else room
         await conversation.ready()
@@ -47,12 +51,17 @@ class TimedTask(WechatyPlugin):
         except Exception as error:
             print(f'something went wrong for timed task plugin: {error}')
 
-    async def my_self(self) -> ContactSelf:
+    async def my_self(self) -> Contact:
         """get self contact"""
-        my_contact_id = self.bot.puppet.self_id()
-        contact = ContactSelf.load(my_contact_id)
+        my_contact_id = self.bot.contact_id
+        contact = Contact.load(my_contact_id)
         await contact.ready()
         return contact
+
+    async def on_login(self, contact: Contact):
+        """store contact of self"""
+        log.info(f'login as {contact}')
+        bot_contact = contact
 
     @classmethod
     def split_quote_and_mention(cls, text):
@@ -65,9 +74,7 @@ class TimedTask(WechatyPlugin):
     def split_quote(cls, text):
         """split quoted text and reply from given text,
         the pattern is like "talker: quoted"\n(several -)\nreply"""
-        pattern = re.compile(r'\"(.*?)\"\n' +
-                             ' '.join(['-' for _ in range(15)]) +
-                             r'\n(.*?)$')
+        pattern = re.compile(r'(.*?)\n' + r'[-| ]*' + r'\n(.*?)$')
         res = pattern.match(text)
         if res is None:
             return (None, text)
@@ -77,7 +84,7 @@ class TimedTask(WechatyPlugin):
     def split_mention(cls, text):
         """split @sb from given text,
         pattern is like: text @alias\u2005"""
-        pattern = re.compile(r'(.*?)\s+(.*?)\u\d+$')
+        pattern = re.compile(r'(.*?)\s*@(.*?)(?:\u2005)?$')
         res = pattern.match(text)
         if res is None:
             return (text, None)

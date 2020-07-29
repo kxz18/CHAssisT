@@ -10,6 +10,10 @@ from datetime import datetime, timedelta
 from wechaty import Message, Contact, Room
 from wechaty.plugin import WechatyPlugin
 from wechaty.user.contact_self import ContactSelf
+from wechaty_puppet import get_logger
+
+log = get_logger('Member Mananger Plugin')
+
 
 class MemberManager(WechatyPlugin):
     """member manager plugin for bot"""
@@ -34,9 +38,9 @@ class MemberManager(WechatyPlugin):
         from_contact = msg.talker()
         quoted, text, mention = self.split_quote_and_mention(msg.text())
         room = msg.room()
-        to_bot = self_contact.contact_id in msg.payload.mention_ids or\
-                 self_contact.contact_id == msg.payload.to_id or\
-                 self_contact.name() == mention
+        to_bot = self_contact.get_id() in msg.payload.mention_ids or\
+                 self_contact.get_id() == msg.payload.to_id or\
+                 self_contact.payload.name == mention
         conversation: Union[
             Room, Contact] = from_contact if room is None else room
         await conversation.ready()
@@ -73,12 +77,17 @@ class MemberManager(WechatyPlugin):
                     await conversation.say(f'{removed_contact.name()} is removed from chat')
         print(msg.__dict__)
 
-    async def my_self(self) -> ContactSelf:
+    async def my_self(self) -> Contact:
         """get self contact"""
-        my_contact_id = self.bot.puppet.self_id()
-        contact = ContactSelf.load(my_contact_id)
+        my_contact_id = self.bot.contact_id
+        contact = Contact.load(my_contact_id)
         await contact.ready()
         return contact
+
+    async def on_login(self, contact: Contact):
+        """store contact of self"""
+        log.info(f'login as {contact}')
+        bot_contact = contact
 
     async def on_room_join(self, room: Room, invitees: List[Contact],
                            inviter: Contact, date: datetime):
@@ -104,9 +113,7 @@ class MemberManager(WechatyPlugin):
     def split_quote(cls, text):
         """split quoted text and reply from given text,
         the pattern is like "talker: quoted"\n(several -)\nreply"""
-        pattern = re.compile(r'\"(.*?)\"\n' +
-                             ' '.join(['-' for _ in range(15)]) +
-                             r'\n(.*?)$')
+        pattern = re.compile(r'(.*?)\n' + r'[-| ]*' + r'\n(.*?)$')
         res = pattern.match(text)
         if res is None:
             return (None, text)
@@ -116,7 +123,7 @@ class MemberManager(WechatyPlugin):
     def split_mention(cls, text):
         """split @sb from given text,
         pattern is like: text @alias\u2005"""
-        pattern = re.compile(r'(.*?)\s+(.*?)\u\d+$')
+        pattern = re.compile(r'(.*?)\s*@(.*?)(?:\u2005)?$')
         res = pattern.match(text)
         if res is None:
             return (text, None)
