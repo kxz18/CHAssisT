@@ -11,9 +11,12 @@ from data.msg_with_tag import MsgWithTag
 from tagging_modules.question_answering import QuestionAnswering
 from tagging_modules import reply
 
-KEY_EXPIRY = 'expiry'
-KEY_DELETE = 'delete'
-KEY_STOP = 'stop'
+KEY_EXPIRY = '有效期'
+KEY_DELETE = '删除'
+KEY_STOP = '停止'
+# KEY_EXPIRY = 'expiry'
+# KEY_DELETE = 'delete'
+# KEY_STOP = 'stop'
 KEY_SPLIT = r'#'
 
 

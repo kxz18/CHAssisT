@@ -8,7 +8,8 @@ from dateutil.parser import parse
 
 from data.data_transfer import DataTransfer
 
-KEY_DISPLAY = 'display'
+KEY_DISPLAY = '浏览'
+# KEY_DISPLAY = 'display'
 KEY_SPLIT = r'#'
 
 

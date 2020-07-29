@@ -8,7 +8,8 @@ from wechaty import Contact
 from wechaty.user import Room
 from timed_task_modules import reply
 
-KEY_TIMED_TASK = 'timed message'
+KEY_TIMED_TASK = '定时消息'
+# KEY_TIMED_TASK = 'timed message'
 KEY_SPLIT = r'#'
 
 
