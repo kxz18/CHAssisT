@@ -18,13 +18,15 @@ class MemberManager(WechatyPlugin):
         """get the name of the plugin"""
         return 'member manager'
 
-    def __init__(self):
+    def __init__(self, language='zh'):
         """attributes:
         counts: counts of thumbsdown of certain person
-        reason: date when somebody last receive thumbsdown"""
+        reason: date when somebody last receive thumbsdown
+        language: en for English, zh for Chinese"""
         self.counts = defaultdict(int)
         self.date = defaultdict(datetime)
         self.thumbsdown = '[thumbsdown]'
+        self.language = language
 
     async def on_message(self, msg: Message):
         """listen message event"""
@@ -41,7 +43,10 @@ class MemberManager(WechatyPlugin):
         print(quoted, text, from_contact.get_id(), to_bot)
 
         if isinstance(conversation, Contact):
-            await conversation.say('Not work if not in chat room')
+            if self.language == 'zh':
+                await conversation.say('成员管理功能必须在群聊中使用')
+            else:
+                await conversation.say('Not work if not in chat room')
             return
 
         counts_limit = 3 if len(await conversation.member_list()) > 4 else 2
@@ -50,13 +55,22 @@ class MemberManager(WechatyPlugin):
             if self.counts[mention] != 0 and time_delta > timedelta(hours=12):
                 self.counts[mention] = 0    # former thumbsdown expired
             self.counts[mention] = self.counts[mention] + 1
-            await conversation.say(f'thumbsdown of {mention} is currently {self.counts[mention]}, '
-                                   f'member with thumbsdown to {counts_limit} '
-                                   'will be removed from chat')
+
+            if self.language == 'zh':
+                await conversation.say(f'成员{mention}目前已经被踩{self.counts[mention]}次，'
+                                       f'被踩{counts_limit}次的成员将被移出群聊')
+            else:
+                await conversation.say(f'thumbsdown of {mention} is currently {self.counts[mention]}, '
+                                       f'member with thumbsdown to {counts_limit} '
+                                       'will be removed from chat')
             if self.counts[mention] >= counts_limit:
                 removed_contact = Contact.load(mention)
                 conversation.delete(removed_contact)
-                await conversation.say(f'{removed_contact.name()} is removed from chat')
+                
+                if self.language == 'zh':
+                    await conversation.say(f'{removed_contact.name()}已被移出群聊')
+                else:
+                    await conversation.say(f'{removed_contact.name()} is removed from chat')
         print(msg.__dict__)
 
     async def my_self(self) -> ContactSelf:
@@ -70,9 +84,14 @@ class MemberManager(WechatyPlugin):
                            inviter: Contact, date: datetime):
         """called when somebody was invited to the group chat"""
         await room.ready()
-        await room.say(f'{",".join([contact.name() for contact in invitees])} '
-                       f'{"has" if len(invitees) == 1 else "have"} '
-                       f'joined, welcome !')
+        if self.language == 'zh':
+            await room.say(f'{"、".join([contact.name() for contact in invitees])} '
+                           '加入了我们的群聊，欢迎！')
+
+        else:
+            await room.say(f'{",".join([contact.name() for contact in invitees])} '
+                           f'{"has" if len(invitees) == 1 else "have"} '
+                           f'joined, welcome !')
 
     @classmethod
     def split_quote_and_mention(cls, text):
