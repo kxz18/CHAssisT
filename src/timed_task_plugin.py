@@ -37,15 +37,15 @@ class TimedTask(WechatyPlugin):
         conversation: Union[
             Room, Contact] = from_contact if room is None else room
         await conversation.ready()
-        print(quoted, text, from_contact.get_id(), to_bot)
-        if self.task_controller.handle_msg(text, conversation, to_bot):
-            print('task controller found reply')
-            await conversation.say(self.task_controller.get_reply())
-        elif self.help.handle_msg(text, to_bot):
-            print('help of timed task plugin found reply')
-            await conversation.say(self.help.get_reply())
-
-        print(msg.__dict__)
+        try:
+            if self.task_controller.handle_msg(text, conversation, to_bot):
+                print('task controller found reply')
+                await conversation.say(self.task_controller.get_reply())
+            elif self.help.handle_msg(text, to_bot):
+                print('help of timed task plugin found reply')
+                await conversation.say(self.help.get_reply())
+        except Exception as error:
+            print(f'something went wrong for timed task plugin: {error}')
 
     async def my_self(self) -> ContactSelf:
         """get self contact"""

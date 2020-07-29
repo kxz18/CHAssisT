@@ -12,8 +12,19 @@ def set_cron_timed_task_success(params, message):
     time_point = ''
     for key in params:
         if params[key] != '*':
-            time_point += f'{key} {params[key]}'
-    return f'message {message} will be sent on every {time_point}'
+            if key == 'week day':
+                time_point += f'{key} {params[key]}'
+            else:
+                time_point += f'{params[key]} {key}'
+    return f'"{message}"将在每个以下时间点被发送：{time_point}'\
+           .replace('year', '年')\
+           .replace('month', '月')\
+           .replace('day', '日')\
+           .replace('week day', '星期')\
+           .replace('hour', '时')\
+           .replace('minute', '分')\
+           .replace(' ', '')
+    # return f'message {message} will be sent on every {time_point}'
 
 
 def set_date_timed_task_success(date, message):
@@ -21,4 +32,5 @@ def set_date_timed_task_success(date, message):
     params:
         date: date to sent
         message: message to be sent"""
-    return f'message {message} will be sent on {date}'
+    return f'"{message}"将在{date}被发出'
+    # return f'message {message} will be sent on {date}'
