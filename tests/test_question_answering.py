@@ -53,5 +53,5 @@ def test_confidence_no():
     interface = init_data()
     question_answering = QuestionAnswering(interface)
     assert not question_answering.handle_msg('hey man', False)
-    assert question_answering.handle_msg('hey man', True)
+    assert question_answering.handle_msg('hey man ?', True)
     assert question_answering.get_reply() == reply.no_answer_found()
