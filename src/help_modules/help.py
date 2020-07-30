@@ -25,7 +25,7 @@ class Help:
         if revised_text == self.key_help:    # display navigation help info
             self.reply = self.all()
             return True
-        pattern = re.compile(r'^' + self.key_help + self.key_help + r'(.*?)$')
+        pattern = re.compile(r'^' + self.key_help + self.key_split + r'(.*?)$')
         res = pattern.match(revised_text)
         if res is not None:
             if res.group(1) in self.help_dict.keys():   # found keyword
@@ -42,13 +42,16 @@ class Help:
     def all(self):
         """all help information"""
         help_keywords = '\n'.join([f'- {key}' for key in self.help_dict])
+        first_key = list(self.help_dict.keys())[0]
         if self.lang == 'zh-cn':
-            return '这是消息打标系统的帮助文档\n'\
+            return '这是各种功能的帮助文档\n'\
                    f'提供的功能如下：\n{help_keywords}\n'\
-                   '如果想了解具体功能的使用方法，可以给我发消息：'\
-                   f'{self.key_help}{self.key_split}功能名\n'
+                   '如果想了解具体功能的使用方法，可以用这样的格式给我发消息：\n\n'\
+                   f'{self.key_help}{self.key_split}功能名\n\n'\
+                   f'例如想了解功能"{first_key}"的详细信息，可以发送'\
+                   f'"{self.key_help}{self.key_split}{first_key}"向我发问'
 
-        return 'This is help doc for tagging system\n'\
+        return 'This is help doc for all functions\n'\
                'To get help of certain keywords, type commands like:'\
                f'{self.key_help}{self.key_split}function keywords\n'\
                f'all function keywords are as follows:\n{help_keywords}'
