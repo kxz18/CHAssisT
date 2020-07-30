@@ -8,11 +8,9 @@ import pickle
 
 from wechaty import Message, Contact, Room
 from wechaty.plugin import WechatyPlugin
-from wechaty.user.contact_self import ContactSelf
 from wechaty_puppet import get_logger
 
 from timed_task_modules.task_controller import TaskController
-from timed_task_modules.help import Help
 from utils.extract_msg import split_quote_and_mention
 
 log = get_logger('Timed Task Plugin')

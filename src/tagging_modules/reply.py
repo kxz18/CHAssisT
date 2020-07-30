@@ -53,7 +53,7 @@ def no_answer_found():
 
 def similar_answer_help(tags: list):
     """provide similar answer recommend"""
-    choices = '\n'.join(tags)
+    choices = '\n'.join([f'- {tag}' for tag in tags])
     # tip = f'Maybe you can ask with following key words ?\n{choices}'
     tip = f'我有点不确定，或许你可以在这些标注中选一个进行提问?\n{choices}'
     return tip
@@ -70,4 +70,10 @@ def is_question(text):
 def question_signals():
     """return signals indicating this is a question"""
     return ['？', '?', '么', '嘛', '吗', '呢', '啊', '什么', '怎么', '如何', '哪', '为什么',
-            '几', '谁', '多少']
+            '几', '谁', '多少', '啥']
+
+
+# display
+def no_msg_found():
+    """when no message can be found within given span"""
+    return '貌似还没有对应的信息被存储下来'

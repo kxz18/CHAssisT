@@ -104,10 +104,10 @@ class Database:
         except FileNotFoundError:
             self.tables = {}
         self.config_path = config_path
-
-    def reconnect(self):
-        """reconnect to database"""
         self.close()
+
+    def connect(self):
+        """reconnect to database"""
         self.conn = sqlite3.connect(self.path)
 
     def close(self):
@@ -127,6 +127,7 @@ class Database:
             primary: attributes of primary key
             fields: list of fields, each is a list
         """
+        self.connect()
         cursor = self.conn.cursor()
         cursor.execute(f'CREATE TABLE {tname}'
                        f'({primary.to_str()}, '
@@ -134,6 +135,7 @@ class Database:
         self.conn.commit()
         # store table locally
         self.tables[tname] = Table(tname, primary, fields)
+        self.close()
 
     def insert(self, tname, keys, values):
         """insert into table
@@ -142,6 +144,7 @@ class Database:
             keys: name of fields
             values: corresponding values"""
         # revise values, as TEXT or CHAR() must be surrounded by a pair of ''
+        self.connect()
         table = self.tables[tname]
         for idx, key in enumerate(keys):
             values[idx] = table.revise_data(key, values[idx])
@@ -150,6 +153,7 @@ class Database:
         cursor.execute(f'INSERT INTO {tname} ({",".join(keys)}) '
                        f'VALUES ({",".join(values)})')
         self.conn.commit()
+        self.close()
 
     def select(self, tname, columns=None):
         """select columns from table
@@ -158,12 +162,15 @@ class Database:
             columns: required fields, default all
         return:
             list<tuple of data>"""
+        self.connect()
         # initialize columns
         if columns is None:
             columns = ['*']
         cursor = self.conn.cursor()
         cursor.execute(f'SELECT {",".join(columns)} from {tname}')
-        return cursor.fetchall()
+        data = cursor.fetchall()
+        self.close()
+        return data
 
     def search(self, tname, key, value, columns=None):
         """search by id in selected table
@@ -175,6 +182,7 @@ class Database:
         return:
             tuple of values of selected columns"""
         # initialize columns
+        self.connect()
         if columns is None:
             columns = ['*']
 
@@ -182,7 +190,9 @@ class Database:
         cursor = self.conn.cursor()
         cursor.execute(f'SELECT {",".join(columns)} from {tname} '
                        f'where {key}={table.revise_data(key, value)}')
-        return cursor.fetchall()
+        data = cursor.fetchall()
+        self.close()
+        return data
 
     # pylint: disable=R0913
     def search_by_range(self, tname, key, start=None, end=None, columns=None):
@@ -194,6 +204,7 @@ class Database:
             end: right value of the field
             columns: selected columns"""
         # initialize columns
+        self.connect()
         if columns is None:
             columns = ['*']
         table = self.tables[tname]
@@ -210,7 +221,9 @@ class Database:
         else:
             # delete in range(start, end)
             cursor.execute(select_cmd + f' where {start_condition} and {end_condition};')
-        return cursor.fetchall()
+        data = cursor.fetchall()
+        self.close()
+        return data
 
     # pylint:disable=R0913
     def update(self, tname, keys, values, key=None, value=None):
@@ -221,6 +234,7 @@ class Database:
             values: list, updating values
             key: str, search key
             value: search value"""
+        self.connect()
         table = self.tables[tname]
         # form update sequence
         update_seq = ','.join([field + '=' + str(table.revise_data(field, values[idx]))
@@ -233,6 +247,7 @@ class Database:
         cursor.execute(f'UPDATE {tname} set '
                        f'{update_seq} {where};')
         self.conn.commit()
+        self.close()
 
     def delete(self, tname, key, value):
         """delete certain rows
@@ -240,11 +255,13 @@ class Database:
             tname: name of table
             key: field name
             value: value of the field"""
+        self.connect()
         table = self.tables[tname]
         cursor = self.conn.cursor()
         cursor.execute(f'DELETE from {tname} '
                        f'where {key}={table.revise_data(key, value)}')
         self.conn.commit()
+        self.close()
 
     def delete_by_time(self, tname, time_key, start, end):
         """delete certain rows by time range, None means infinite
@@ -253,6 +270,7 @@ class Database:
             time_key: str, field name of time stamp
             start: datetime, start time
             end: datetime, end time"""
+        self.connect()
         table = self.tables[tname]
         cursor = self.conn.cursor()
         start_condition = f'{time_key}>={table.revise_data(time_key, str(start))}'
@@ -267,3 +285,4 @@ class Database:
             # delete in range(start, end)
             cursor.execute(f'DELETE from {tname} where {start_condition} and {end_condition}')
         self.conn.commit()
+        self.close()
