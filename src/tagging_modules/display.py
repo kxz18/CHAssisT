@@ -7,6 +7,7 @@ import re
 from dateutil.parser import parse
 
 from data.data_transfer import DataTransfer
+from tagging_modules import reply
 
 KEY_DISPLAY = '浏览'
 # KEY_DISPLAY = 'display'
@@ -44,7 +45,9 @@ class Display:
             start: start of time span, can be None, which means no restrict
             end: end of time span, can be None"""
         msgs_in_time_range = self.interface.get_msgs_by_time_range(start, end)
-        return '\n'.join([msg.to_str() for _, msg in msgs_in_time_range])
+        if len(msgs_in_time_range) == 0:
+            return reply.no_msg_found()
+        return '\n'.join([f'#{_id} ' + msg.to_str() for _id, msg in msgs_in_time_range])
 
     def handle_display_msgs(self, text):
         """display msgs, pattern is like:

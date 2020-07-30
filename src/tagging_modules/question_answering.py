@@ -76,7 +76,8 @@ class QuestionAnswering:
             to_bot: bool, if saying to the bot"""
         self.reply = ''     # clear former reply
         sorted_tags = self.interface.get_all_id_and_tags()  # list of tuple (id, tag)
-        if len(sorted_tags) == 0:   # no saved messages
+        if len(sorted_tags) == 0 or not reply.is_question(text):
+            # no saved messages or not a question
             return False
         sorted_tags.sort(key=lambda x: self.cosine_similarity(text, x[1]), reverse=True)
         _id, most_likely_answer = sorted_tags[0]
@@ -98,7 +99,7 @@ class QuestionAnswering:
             return True
 
         if confidence == Confidence.NO:     # compeletely irrelevent
-            if to_bot and reply.is_question(text):
+            if to_bot:
                 self.reply = reply.no_answer_found()
                 return True
             return False

@@ -9,7 +9,6 @@ from datetime import datetime, timedelta
 
 from wechaty import Message, Contact, Room
 from wechaty.plugin import WechatyPlugin
-from wechaty.user.contact_self import ContactSelf
 from wechaty_puppet import get_logger
 
 from utils.extract_msg import split_quote_and_mention
