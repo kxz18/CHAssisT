@@ -27,7 +27,6 @@ def init_data():
     for quoted, tag, in MSG_CONTENTS:
         msg = MsgWithTag(quoted, tag, 'me')     # talker is not important here
         interface.save_msg(msg)
-    interface.save()
     return interface
 
 def test_confidence_high():
@@ -53,5 +52,5 @@ def test_confidence_no():
     interface = init_data()
     question_answering = QuestionAnswering(interface)
     assert not question_answering.handle_msg('hey man', False)
-    assert question_answering.handle_msg('hey man', True)
+    assert question_answering.handle_msg('hey man ?', True)
     assert question_answering.get_reply() == reply.no_answer_found()

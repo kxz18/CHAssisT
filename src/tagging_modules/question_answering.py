@@ -98,7 +98,7 @@ class QuestionAnswering:
             return True
 
         if confidence == Confidence.NO:     # compeletely irrelevent
-            if to_bot:
+            if to_bot and reply.is_question(text):
                 self.reply = reply.no_answer_found()
                 return True
             return False

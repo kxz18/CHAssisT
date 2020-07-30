@@ -17,7 +17,6 @@ def test_create():
         except FileNotFoundError:
             pass
     interface = DataTransfer(Database(PATH))
-    interface.save()
 
 def test_save_msg(msg='hahah', tag='test tag', talker='admin',
                   expiry=None, time=None, force_create=True):
@@ -26,14 +25,12 @@ def test_save_msg(msg='hahah', tag='test tag', talker='admin',
     msg = MsgWithTag(msg, tag, talker, expiry, time)
     interface.save_msg(msg, force_create=force_create)
     assert interface.get_msg_by_id(1) is not None
-    interface.save()
 
 def test_del_msg_by_id():
     """test delete a message"""
     interface = DataTransfer(Database(PATH))
     interface.del_msg_by_id(1)
     assert interface.get_msg_by_id(1) is None
-    interface.save()
 
 def test_get_all_msgs():
     """test get all messages"""

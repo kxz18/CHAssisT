@@ -57,3 +57,17 @@ def similar_answer_help(tags: list):
     # tip = f'Maybe you can ask with following key words ?\n{choices}'
     tip = f'我有点不确定，或许你可以在这些标注中选一个进行提问?\n{choices}'
     return tip
+
+
+def is_question(text):
+    """judge if text is a question"""
+    for key in question_signals():
+        if key in text:
+            return True
+    return False
+
+
+def question_signals():
+    """return signals indicating this is a question"""
+    return ['？', '?', '么', '嘛', '吗', '呢', '啊', '什么', '怎么', '如何', '哪', '为什么',
+            '几', '谁', '多少']
