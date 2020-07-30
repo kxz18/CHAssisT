@@ -76,18 +76,23 @@ class QuestionAnswering:
             to_bot: bool, if saying to the bot"""
         self.reply = ''     # clear former reply
         sorted_tags = self.interface.get_all_id_and_tags()  # list of tuple (id, tag)
-        if len(sorted_tags) == 0 or not reply.is_question(text):
-            # no saved messages or not a question
+        if not reply.is_question(text):
+            # not a question
             return False
-        sorted_tags.sort(key=lambda x: self.cosine_similarity(text, x[1]), reverse=True)
-        _id, most_likely_answer = sorted_tags[0]
-        confidence = self.cmp_tags(text, most_likely_answer)
+        if len(sorted_tags) == 0:
+            # no message saved
+            confidence = Confidence.NO
+        else:
+            sorted_tags.sort(key=lambda x: self.cosine_similarity(text, x[1]), reverse=True)
+            _id, most_likely_answer = sorted_tags[0]
+            confidence = self.cmp_tags(text, most_likely_answer)
 
         if confidence == Confidence.HIGH:   # find the answer
             target = self.interface.get_msg_by_id(_id)
             assert target is not None
             self.reply = target.msg
             return True
+
         if confidence == Confidence.MEDIAN:  # has a chance of finding the answer
             choices = []
             for _, tag in sorted_tags:
