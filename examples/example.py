@@ -11,6 +11,8 @@ from wechaty.user import Message, Room
 from tagging_plugin import Tagging
 from timed_task_plugin import TimedTask
 from member_manager_plugin import MemberManager
+from help_plugin import HelpSystem
+from help_modules.example_dict import groupchat_bot_help_zh
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
@@ -60,7 +62,8 @@ async def main():
     # pylint: disable=W0603, C0103
     global bot
     bot = MyBot()
-    bot.use([Tagging(), TimedTask(), MemberManager()])
+    bot.use([Tagging(), TimedTask(), MemberManager(),
+             HelpSystem('帮助', '#', groupchat_bot_help_zh)])
     await bot.start()
 
 asyncio.run(main())
