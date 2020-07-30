@@ -27,7 +27,6 @@ def init_data():
     for quoted, tag, in MSG_CONTENTS:
         msg = MsgWithTag(quoted, tag, 'me')     # talker is not important here
         interface.save_msg(msg)
-    interface.save()
     return interface
 
 def test_confidence_high():

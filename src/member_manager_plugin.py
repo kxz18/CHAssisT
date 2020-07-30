@@ -12,6 +12,8 @@ from wechaty.plugin import WechatyPlugin
 from wechaty.user.contact_self import ContactSelf
 from wechaty_puppet import get_logger
 
+from utils.extract_msg import split_quote_and_mention
+
 log = get_logger('Member Mananger Plugin')
 
 
@@ -36,7 +38,7 @@ class MemberManager(WechatyPlugin):
         """listen message event"""
         self_contact = await self.my_self()
         from_contact = msg.talker()
-        quoted, text, mention = self.split_quote_and_mention(msg.text())
+        quoted, text, mention = split_quote_and_mention(msg.text())
         room = msg.room()
         to_bot = self_contact.get_id() in msg.payload.mention_ids or\
                  self_contact.get_id() == msg.payload.to_id or\
@@ -84,11 +86,6 @@ class MemberManager(WechatyPlugin):
         await contact.ready()
         return contact
 
-    async def on_login(self, contact: Contact):
-        """store contact of self"""
-        log.info(f'login as {contact}')
-        bot_contact = contact
-
     async def on_room_join(self, room: Room, invitees: List[Contact],
                            inviter: Contact, date: datetime):
         """called when somebody was invited to the group chat"""
@@ -101,30 +98,3 @@ class MemberManager(WechatyPlugin):
             await room.say(f'{",".join([contact.name() for contact in invitees])} '
                            f'{"has" if len(invitees) == 1 else "have"} '
                            f'joined, welcome !')
-
-    @classmethod
-    def split_quote_and_mention(cls, text):
-        """split quoted text, reply text and mention"""
-        quoted, text_and_mention = cls.split_quote(text)
-        reply, mention = cls.split_mention(text_and_mention)
-        return (quoted, reply, mention)
-
-    @classmethod
-    def split_quote(cls, text):
-        """split quoted text and reply from given text,
-        the pattern is like "talker: quoted"\n(several -)\nreply"""
-        pattern = re.compile(r'(.*?)\n' + r'[-| ]*' + r'\n(.*?)$')
-        res = pattern.match(text)
-        if res is None:
-            return (None, text)
-        return (res.group(1), res.group(2))
-
-    @classmethod
-    def split_mention(cls, text):
-        """split @sb from given text,
-        pattern is like: text @alias\u2005"""
-        pattern = re.compile(r'(.*?)\s*@(.*?)(?:\u2005)?$')
-        res = pattern.match(text)
-        if res is None:
-            return (text, None)
-        return (res.group(1), res.group(2))

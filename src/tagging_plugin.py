@@ -16,7 +16,7 @@ from data.data_transfer import DataTransfer
 from tagging_modules.question_answering import QuestionAnswering
 from tagging_modules.tag_controller import TagController
 from tagging_modules.display import Display
-from tagging_modules.help import Help
+from utils.extract_msg import split_quote_and_mention
 
 log = get_logger('Tagging plugin')
 
@@ -39,7 +39,6 @@ class Tagging(WechatyPlugin):
         self.question_answering = QuestionAnswering(self.interface)
         self.tag_controller = TagController(self.interface)
         self.display = Display(self.interface)
-        self.help = Help()
 
     async def on_message(self, msg: Message):
         """listen message event"""
@@ -47,7 +46,7 @@ class Tagging(WechatyPlugin):
         from_contact = msg.talker()
         log.info('below are dict of message: ')
         log.info(str(msg.__dict__))
-        quoted, text, mention = self.split_quote_and_mention(msg.text())
+        quoted, text, mention = split_quote_and_mention(msg.text())
         log.info('finish spliting')
         log.info(f'quoted: {quoted}, text: {text}, mention: {mention}')
         room = msg.room()
@@ -68,9 +67,6 @@ class Tagging(WechatyPlugin):
             elif self.display.handle_msg(text, to_bot):
                 log.info('display found reply')
                 await conversation.say(self.display.get_reply())
-            elif self.help.handle_msg(text, to_bot):
-                log.info('help system found reply')
-                await conversation.say(self.help.get_reply())
         except Exception as error:
             log.info(f'something went wrong for tagging plugin: {error}')
 
@@ -86,31 +82,3 @@ class Tagging(WechatyPlugin):
         """store contact of self"""
         log.info(f'login as {contact}')
         bot_contact = contact
-
-    @classmethod
-    def split_quote_and_mention(cls, text):
-        """split quoted text, reply text and mention"""
-        quoted, text_and_mention = cls.split_quote(text)
-        reply, mention = cls.split_mention(text_and_mention)
-        return (quoted, reply, mention)
-
-    @classmethod
-    def split_quote(cls, text):
-        """split quoted text and reply from given text,
-        the pattern is like "talker: quoted"\n(several -)\nreply
-        return: (quoted, text and mentions)"""
-        pattern = re.compile(r'(.*?)\n' + r'[-| ]*' + r'\n(.*?)$')
-        res = pattern.match(text)
-        if res is None:
-            return (None, text)
-        return (res.group(1), res.group(2))
-
-    @classmethod
-    def split_mention(cls, text):
-        """split @sb from given text,
-        pattern is like: text @alias"""
-        pattern = re.compile(r'(.*?)\s*@(.*?)(?:\u2005)?$')
-        res = pattern.match(text)
-        if res is None:
-            return (text, None)
-        return (res.group(1), res.group(2))

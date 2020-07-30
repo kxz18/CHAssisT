@@ -8,26 +8,27 @@ import pickle
 
 from wechaty import Message, Contact, Room
 from wechaty.plugin import WechatyPlugin
-from wechaty.user.contact_self import ContactSelf
 from wechaty_puppet import get_logger
 
-from timed_task_modules.task_controller import TaskController
-from timed_task_modules.help import Help
+from help_modules.help import Help
 from utils.extract_msg import split_quote_and_mention
 
-log = get_logger('Timed Task Plugin')
+log = get_logger('Help System')
 
 
-class TimedTask(WechatyPlugin):
+class HelpSystem(WechatyPlugin):
     """tagging system plugin for bot"""
     @property
     def name(self) -> str:
         """get the name of the plugin"""
-        return 'timed task'
+        return 'help system'
 
-    def __init__(self):
-        """doc"""
-        self.task_controller = TaskController()
+    def __init__(self, key_help, key_split, help_dict):
+        """params:
+            key_help: keyword of help
+            key_split: signal of dividing help keywords and other content
+            help_dict: content of help"""
+        self.help = Help(key_help, key_split, help_dict)
 
     async def on_message(self, msg: Message):
         """listen message event"""
@@ -42,15 +43,16 @@ class TimedTask(WechatyPlugin):
             Room, Contact] = from_contact if room is None else room
         await conversation.ready()
         try:
-            if self.task_controller.handle_msg(text, conversation, to_bot):
-                print('task controller found reply')
-                await conversation.say(self.task_controller.get_reply())
+            if self.help.handle_msg(text, to_bot):
+                log.info('help system found reply')
+                await conversation.say(self.help.get_reply())
         except Exception as error:
-            print(f'something went wrong for timed task plugin: {error}')
+            log.info(f'something went wrong for help system plugin: {error}')
 
     async def my_self(self) -> Contact:
         """get self contact"""
         my_contact_id = self.bot.contact_id
         contact = Contact.load(my_contact_id)
         await contact.ready()
+        log.info(f'load self contact: {contact}')
         return contact
