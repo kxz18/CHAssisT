@@ -30,7 +30,7 @@ class MemberManager(WechatyPlugin):
         language: en for English, zh for Chinese"""
         self.counts = defaultdict(int)
         self.date = defaultdict(datetime)
-        self.thumbsdown = '[thumbsdown]'
+        self.thumbsdown = '[弱]'
         self.language = language
 
     async def on_message(self, msg: Message):
@@ -45,7 +45,6 @@ class MemberManager(WechatyPlugin):
         conversation: Union[
             Room, Contact] = from_contact if room is None else room
         await conversation.ready()
-        print(quoted, text, from_contact.get_id(), to_bot)
 
         if isinstance(conversation, Contact):
             if self.language == 'zh':
@@ -53,13 +52,15 @@ class MemberManager(WechatyPlugin):
             else:
                 await conversation.say('Not work if not in chat room')
             return
-
-        counts_limit = 3 if len(await conversation.member_list()) > 4 else 2
-        if text == self.thumbsdown:
+        member_count = len(await conversation.member_list())
+        # real people >= 4, 3 thumbsdown needed, 3 => 2, 2 => 1
+        counts_limit = 3 if member_count > 4 else member_count // 2
+        if text.strip() == self.thumbsdown:
             time_delta = datetime.now() - self.date[mention]
             if self.counts[mention] != 0 and time_delta > timedelta(hours=12):
                 self.counts[mention] = 0    # former thumbsdown expired
             self.counts[mention] = self.counts[mention] + 1
+            self.date[mention] = datetime.now()
 
             if self.language == 'zh':
                 await conversation.say(f'成员{mention}目前已经被踩{self.counts[mention]}次，'
