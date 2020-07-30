@@ -44,7 +44,7 @@ def test_expiry():
     data_num = len(interface.get_all_msgs())
     expiry = datetime.now() + timedelta(seconds=1)
     msg = f'test expiry, {KEY_EXPIRY}{KEY_SPLIT}{str(expiry)}'
-    controller.handle_msg(quoted='first', msg=msg,
+    controller.handle_msg(quoted='second', msg=msg,
                           talker='me', to_bot=True)
     sleep(1)
     assert data_num == len(interface.get_all_msgs())

@@ -6,17 +6,20 @@
 # TagController
 def save_msg_success():
     """successfully saved a tagged message"""
-    return 'Received'
+    return '收到'
+    # return 'Received'
 
 
 def del_msg_success(_id):
     """successfully deleted a message"""
-    return f'Deleted #{_id}'
+    return f'已删除 #{_id}'
+    # return f'Deleted #{_id}'
 
 
 def parse_expiry_error():
     """given expiry date with wrong format"""
-    return 'Expiry format error, consult the help doc for format'
+    return '有效期的格式好像不太对，可以参考下帮助文档'
+    # return 'Expiry format error, consult the help doc for format'
 
 
 def set_timed_delete_success(params, delta):
@@ -28,24 +31,49 @@ def set_timed_delete_success(params, delta):
     for key in params:
         if params[key] != '*':
             time_point += f'{key} {params[key]}'
-    return f'messages that are {delta} days before will be deleted on every {time_point}'
+    return f'{delta}天前的消息将会在每个{time_point}被删除'
+    # return f'messages that are {delta} days before will be deleted on every {time_point}'
 
 
 def stop_timed_delete(success):
     """return reply of stopping timed delete according to success status"""
     if success:
-        return 'Successfully stoped timed delete'
-    return 'No timed delete task running'
+        return '成功停止定时删除'
+        # return 'Successfully stoped timed delete'
+    return '目前没有定时删除的任务正在进行'
+    # return 'No timed delete task running'
 
 
 # Question Answering
 def no_answer_found():
     """cannot find any answer"""
-    return 'Sorry, but I really don\'t know'
+    return '不好意思，这个问题我似乎不知道答案'
+    # return 'Sorry, but I really don\'t know'
 
 
 def similar_answer_help(tags: list):
     """provide similar answer recommend"""
-    choices = '\n'.join(tags)
-    tip = f'Maybe you can ask with following key words ?\n{choices}'
+    choices = '\n'.join([f'- {tag}' for tag in tags])
+    # tip = f'Maybe you can ask with following key words ?\n{choices}'
+    tip = f'我有点不确定，或许你可以在这些标注中选一个进行提问?\n{choices}'
     return tip
+
+
+def is_question(text):
+    """judge if text is a question"""
+    for key in question_signals():
+        if key in text:
+            return True
+    return False
+
+
+def question_signals():
+    """return signals indicating this is a question"""
+    return ['？', '?', '么', '嘛', '吗', '呢', '啊', '什么', '怎么', '如何', '哪', '为什么',
+            '几', '谁', '多少', '啥']
+
+
+# display
+def no_msg_found():
+    """when no message can be found within given span"""
+    return '貌似还没有对应的信息被存储下来'
