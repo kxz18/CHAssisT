@@ -16,10 +16,10 @@ def del_msg_success(_id):
     # return f'Deleted #{_id}'
 
 
-def parse_expiry_error():
-    """given expiry date with wrong format"""
-    return '有效期的格式好像不太对，可以参考下帮助文档'
-    # return 'Expiry format error, consult the help doc for format'
+def parse_datetime_error():
+    """given date with wrong format"""
+    return '日期的格式好像不太对，可以参考下帮助文档'
+    # return 'date-time format error, consult the help doc for format'
 
 
 def set_timed_delete_success(params, delta):
