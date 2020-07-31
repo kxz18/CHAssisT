@@ -29,7 +29,7 @@ class MemberManager(WechatyPlugin):
         reason: date when somebody last receive thumbsdown
         language: en for English, zh for Chinese"""
         self.counts = defaultdict(int)
-        self.date = defaultdict(datetime)
+        self.date = defaultdict(lambda: datetime.now())
         self.thumbsdown = '[弱]'
         self.language = language
 
@@ -47,6 +47,8 @@ class MemberManager(WechatyPlugin):
         await conversation.ready()
 
         if isinstance(conversation, Contact):
+            if not to_bot:
+                return
             if self.language == 'zh':
                 await conversation.say('成员管理功能必须在群聊中使用')
             else:
@@ -71,7 +73,7 @@ class MemberManager(WechatyPlugin):
                                        'will be removed from chat')
             if self.counts[mention] >= counts_limit:
                 removed_contact = Contact.load(mention)
-                conversation.delete(removed_contact)
+                await conversation.delete(removed_contact)
                 
                 if self.language == 'zh':
                     await conversation.say(f'{removed_contact.name()}已被移出群聊')
