@@ -72,13 +72,14 @@ class MemberManager(WechatyPlugin):
                                        f'member with thumbsdown to {counts_limit} '
                                        'will be removed from chat')
             if self.counts[mention] >= counts_limit:
-                removed_contact = Contact.load(mention)
+                removed_contact = Contact.load(msg.payload.mention_ids[0])
+                await removed_contact.ready()
                 await conversation.delete(removed_contact)
                 
                 if self.language == 'zh':
-                    await conversation.say(f'{removed_contact.name()}已被移出群聊')
+                    await conversation.say(f'{removed_contact.name}已被移出群聊')
                 else:
-                    await conversation.say(f'{removed_contact.name()} is removed from chat')
+                    await conversation.say(f'{removed_contact.name} is removed from chat')
         print(msg.__dict__)
 
     async def my_self(self) -> Contact:
