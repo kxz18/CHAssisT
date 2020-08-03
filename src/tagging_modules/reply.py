@@ -30,7 +30,17 @@ def set_timed_delete_success(params, delta):
     time_point = ''
     for key in params:
         if params[key] != '*':
-            time_point += f'{key} {params[key]}'
+            if key == 'week day':
+                time_point += f'{key} {params[key]}'
+            else:
+                time_point += f'{params[key]} {key}'
+    time_point = time_point.replace('year', '年')\
+                           .replace('month', '月')\
+                           .replace('day', '日')\
+                           .replace('week day', '星期')\
+                           .replace('hour', '时')\
+                           .replace('minute', '分')\
+                           .replace(' ', '')
     return f'{delta}天前的消息将会在每个{time_point}被删除'
     # return f'messages that are {delta} days before will be deleted on every {time_point}'
 

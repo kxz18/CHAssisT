@@ -8,11 +8,11 @@ from typing import Optional, Union
 from wechaty_puppet import FileBox, ScanStatus  # type: ignore
 from wechaty import Wechaty, Contact
 from wechaty.user import Message, Room
-from tagging_plugin import Tagging
-from timed_task_plugin import TimedTask
-from member_manager_plugin import MemberManager
-from help_plugin import HelpSystem
-from help_modules.example_dict import groupchat_bot_help_zh
+# from tagging_plugin import Tagging
+# from timed_task_plugin import TimedTask
+# from member_manager_plugin import MemberManager
+# from help_plugin import HelpSystem
+# from help_modules.example_dict import groupchat_bot_help_zh
 from groupchat_assistant_plugin import GroupchatAssistant
 
 logging.basicConfig(level=logging.INFO)
@@ -63,8 +63,8 @@ async def main():
     # pylint: disable=W0603, C0103
     global bot
     bot = MyBot()
-    #bot.use([Tagging(), TimedTask(), MemberManager(),
-    #         HelpSystem('帮助', '#', groupchat_bot_help_zh)])
+    # bot.use([Tagging(), TimedTask(), MemberManager(),
+    #          HelpSystem('帮助', '#', groupchat_bot_help_zh)])
     bot.use(GroupchatAssistant())
     await bot.start()
 
