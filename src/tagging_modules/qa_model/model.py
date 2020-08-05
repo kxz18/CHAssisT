@@ -43,6 +43,7 @@ class AttentiveLSTM(nn.Module):
         self.answer_lstm = SingleLSTM(vocab_size, embed_size, hidden_size)
         self.ave_pooling = nn.AvgPool2d((seq_len, 1), stride=1)
         self.softmax = nn.Softmax(dim=-1)
+        self.dropout = nn.Dropout(0.1)
 
     def forward(self, question, answer, len_q, len_a, hidden_q, hidden_a):
         """forward"""
@@ -56,6 +57,9 @@ class AttentiveLSTM(nn.Module):
         # unitization
         final_embed_q = F.normalize(final_embed_q, p=2, dim=-1)
         final_embed_a = F.normalize(final_embed_a, p=2, dim=-1)
+        # dropout
+        final_embed_q = self.dropout(final_embed_q)
+        final_embed_a = self.dropout(final_embed_a)
         # dot
         cosine = final_embed_q.bmm(final_embed_a.transpose(1, 2))   # [batch, 1, 1]
         cosine = cosine.squeeze()
