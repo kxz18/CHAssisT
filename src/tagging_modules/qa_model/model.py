@@ -16,6 +16,7 @@ class SingleLSTM(nn.Module):
     def __init__(self, vocab_size, embed_size, hidden_size, batch_first=True):
         """params
         """
+        super(SingleLSTM, self).__init__()
         self.embedding = nn.Embedding(vocab_size, embed_size)
         self.lstm = nn.LSTM(embed_size, hidden_size,
                             bidirectional=True,
@@ -36,21 +37,23 @@ class SingleLSTM(nn.Module):
 class AttentiveLSTM(nn.Module):
     """question answering model of attentive lstm"""
     
-    def __init__(self, vocab_size, embed_size, hidden_size, seq_len):
+    def __init__(self, vocab_size, embed_size, hidden_size):
         """params:
             """
+        super(AttentiveLSTM, self).__init__()
         self.question_lstm = SingleLSTM(vocab_size, embed_size, hidden_size)
         self.answer_lstm = SingleLSTM(vocab_size, embed_size, hidden_size)
-        self.ave_pooling = nn.AvgPool2d((seq_len, 1), stride=1)
+        #self.ave_pooling = nn.AvgPool2d((seq_len, 1), stride=1)
         self.softmax = nn.Softmax(dim=-1)
         self.dropout = nn.Dropout(0.1)
+        self.hidden_size = hidden_size
 
     def forward(self, question, answer, len_q, len_a, hidden_q, hidden_a):
         """forward"""
         embed_q, new_hid_q = self.question_lstm(question, len_q, hidden_q)   # [batch, seq, hid]
         embed_a, new_hid_a = self.answer_lstm(answer, len_a, hidden_a)
         # paddings do not matter in avgpool as unitization is applied in dot
-        final_embed_q = self.ave_pooling(embed_a)   # [batch, 1, hid]
+        final_embed_q = F.avg_pool2d(embed_a, (embed_a.shape[1], 1), stride=1)   # [batch, 1, hid]
         weights = embed_a.bmm(final_embed_q.transpose(1, 2))   # [batch, seq, 1]
         weights = self.softmax(weights.transpose(1, 2))     # [batch, 1, seq]
         final_embed_a = weights.bmm(embed_a)    # [batch, 1, hid]
@@ -69,11 +72,11 @@ class AttentiveLSTM(nn.Module):
         """init hidden layer with all zero"""
         weight = next(self.parameters())
         # for lstm, hidden and cell states are needed
-        return (weight.new_zeros((1, batch_size, self.hidden_size), requires_grad=requires_grad),
-                weight.new_zeros((1, batch_size, self.hidden_size), requires_grad=requires_grad))
+        return (weight.new_zeros((2, batch_size, self.hidden_size), requires_grad=requires_grad),
+              weight.new_zeros((2, batch_size, self.hidden_size), requires_grad=requires_grad))
 
-    def repackage_hidden(self, hidden):
+    def repackage_hidden(self, hidden, device):
         """cut connection of hidden with former calculation"""
         if isinstance(hidden, torch.Tensor):
-            return hidden.detach()
-        return tuple(self.repackage_hidden(v) for v in hidden)
+            return hidden.detach().to(device)
+        return tuple(self.repackage_hidden(v, device) for v in hidden)

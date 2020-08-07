@@ -23,15 +23,10 @@ def preprocess(path, target, fake_num):
     revised_data = []
     for idx, question in enumerate(questions):
         right_answer = answers[idx]
-        fake_answers_idx = random.sample(range(0, len(questions) - 1), fake_num)
-        fake_answers = [answers[_idx] if _idx < idx else answers[_idx + 1]
-                        for _idx in fake_answers_idx]
         data = {
             'question': question,
             'answer': right_answer,
         }
-        for _idx, fake_answer in enumerate(fake_answers):
-            data[f'fake_answer{_idx}'] = fake_answer
         revised_data.append(json.dumps(data, ensure_ascii=False))
     with open(target, 'w') as fout:
         fout.write('\n'.join(revised_data))
