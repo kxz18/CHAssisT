@@ -89,7 +89,8 @@ def evaluate(model, data_loader):
     return np.mean(epoch_losses)
     
 
-def train(model, target, train_data_loader, valid_data_loader, epoch, lr, _continue):
+def train(model, target, train_data_loader, valid_data_loader,
+          test_data_loader, epoch, lr, _continue):
     
     """training"""
     if _continue:
@@ -144,6 +145,7 @@ def train(model, target, train_data_loader, valid_data_loader, epoch, lr, _conti
             epoch_losses.append(loss.item())
             if batch_num % 100 == 0:
                 flush_print(np.mean(epoch_losses[-30:]))
+                flush_print(str(test(model, test_data_loader, limit = 0.8)))
                 valid_loss = evaluate(model, valid_data_loader)
                 if valid_loss <= min_loss:
                     min_loss = valid_loss
@@ -152,7 +154,7 @@ def train(model, target, train_data_loader, valid_data_loader, epoch, lr, _conti
             
         all_losses.append(np.mean(epoch_losses))
         valid_loss = evaluate(model, valid_data_loader)
-        accu, avg_answer, avg_fake = test(model, test_set, limit = 0.8)
+        accu, avg_answer, avg_fake = test(model, test_data_loader, limit = 0.8)
         end = time.time()
         flush_print(f'epoch: {e}, train loss: {all_losses[-1]}, valid loss: {valid_loss}, elapsed: {end - start} s')
         flush_print(f'on test set: accu: {accu}, average answer similarity: {avg_ansewr}, fake: {avg_fake}')
@@ -179,7 +181,7 @@ def main():
                        num_workers=4, nohup=False)
     model = AttentiveLSTM(valid_set.get_vocab_size(), embed_size=300, hidden_size=512)
     target = 'test_model.param'
-    train(model, target, train_set, valid_set, epoch=20, lr=1e-3)
+    train(model, target, train_set, valid_set, test_set, epoch=20, lr=1e-3, _continue=False)
 
 
 if __name__ == '__main__':
