@@ -7,6 +7,7 @@ from enum import Enum, unique
 
 from data.data_transfer import DataTransfer
 from tagging_modules import reply
+from utils.similarity_algorithm import frequency_cosine_similarity
 
 
 @unique
@@ -19,10 +20,15 @@ class Confidence(Enum):
 
 class QuestionAnswering:
     """class of QA"""
-    def __init__(self, interface: DataTransfer):
-        """interface: interface of database of all tagged messages"""
+    def __init__(self, interface: DataTransfer,
+                 similarity=frequency_cosine_similarity):
+        """params:
+        interface: interface of database of all tagged messages
+        similarity: algorithm of calculating similarity"""
         # database
         self.interface = interface
+        # similarity algorithm
+        self.similarity = similarity
         # reply
         self.reply = ''
 
@@ -32,34 +38,9 @@ class QuestionAnswering:
         # currently just use whole sentence
         return text
 
-    @classmethod
-    def cosine_similarity(cls, text1, text2):
-        """compare the cosine similarity between two texts"""
-
-        # count frequency of characters
-        counter1 = defaultdict(lambda: 0)
-        counter2 = defaultdict(lambda: 0)
-        for char in text1:
-            counter1[char] += 1
-        for char in text2:
-            counter2[char] += 1
-
-        # vectorize and dot
-        all_char = set(list(counter1.keys()) + list(counter2.keys()))
-        len1_sqr = 0
-        len2_sqr = 0
-        dot = 0     # dot result of two vectors
-        for char in all_char:
-            dot += counter1[char] * counter2[char]
-            len1_sqr += counter1[char] * counter1[char]
-            len2_sqr += counter2[char] * counter2[char]
-
-        # cosine similarity
-        return dot / sqrt(len1_sqr * len2_sqr)
-
     def cmp_tags(self, text1, text2):
         """decide whether the two tags are matched"""
-        similarity = self.cosine_similarity(text1, text2)
+        similarity = self.similarity(text1, text2)
         confidence = Confidence.NO
         if similarity > 0.5:     # highly confident
             confidence = Confidence.HIGH
@@ -76,18 +57,23 @@ class QuestionAnswering:
             to_bot: bool, if saying to the bot"""
         self.reply = ''     # clear former reply
         sorted_tags = self.interface.get_all_id_and_tags()  # list of tuple (id, tag)
-        if len(sorted_tags) == 0 or not reply.is_question(text):
-            # no saved messages or not a question
+        if not reply.is_question(text):
+            # not a question
             return False
-        sorted_tags.sort(key=lambda x: self.cosine_similarity(text, x[1]), reverse=True)
-        _id, most_likely_answer = sorted_tags[0]
-        confidence = self.cmp_tags(text, most_likely_answer)
+        if len(sorted_tags) == 0:
+            # no message saved
+            confidence = Confidence.NO
+        else:
+            sorted_tags.sort(key=lambda x: self.similarity(text, x[1]), reverse=True)
+            _id, most_likely_answer = sorted_tags[0]
+            confidence = self.cmp_tags(text, most_likely_answer)
 
         if confidence == Confidence.HIGH:   # find the answer
             target = self.interface.get_msg_by_id(_id)
             assert target is not None
             self.reply = target.msg
             return True
+
         if confidence == Confidence.MEDIAN:  # has a chance of finding the answer
             choices = []
             for _, tag in sorted_tags:
