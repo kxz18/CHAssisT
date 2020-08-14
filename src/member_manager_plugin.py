@@ -29,8 +29,8 @@ class MemberManager(WechatyPlugin):
         reason: date when somebody last receive thumbsdown
         language: en for English, zh for Chinese"""
         self.counts = defaultdict(int)
-        self.date = defaultdict(datetime)
-        self.thumbsdown = '[thumbsdown]'
+        self.date = defaultdict(lambda: datetime.now())
+        self.thumbsdown = '[弱]'
         self.language = language
 
     async def on_message(self, msg: Message):
@@ -45,21 +45,24 @@ class MemberManager(WechatyPlugin):
         conversation: Union[
             Room, Contact] = from_contact if room is None else room
         await conversation.ready()
-        print(quoted, text, from_contact.get_id(), to_bot)
 
         if isinstance(conversation, Contact):
+            if not to_bot:
+                return
             if self.language == 'zh':
                 await conversation.say('成员管理功能必须在群聊中使用')
             else:
                 await conversation.say('Not work if not in chat room')
             return
-
-        counts_limit = 3 if len(await conversation.member_list()) > 4 else 2
-        if text == self.thumbsdown:
+        member_count = len(await conversation.member_list())
+        # real people >= 4, 3 thumbsdown needed, 3 => 2, 2 => 1
+        counts_limit = 3 if member_count > 4 else member_count // 2
+        if text.strip() == self.thumbsdown:
             time_delta = datetime.now() - self.date[mention]
             if self.counts[mention] != 0 and time_delta > timedelta(hours=12):
                 self.counts[mention] = 0    # former thumbsdown expired
             self.counts[mention] = self.counts[mention] + 1
+            self.date[mention] = datetime.now()
 
             if self.language == 'zh':
                 await conversation.say(f'成员{mention}目前已经被踩{self.counts[mention]}次，'
@@ -69,13 +72,14 @@ class MemberManager(WechatyPlugin):
                                        f'member with thumbsdown to {counts_limit} '
                                        'will be removed from chat')
             if self.counts[mention] >= counts_limit:
-                removed_contact = Contact.load(mention)
-                conversation.delete(removed_contact)
+                removed_contact = Contact.load(msg.payload.mention_ids[0])
+                await removed_contact.ready()
+                await conversation.delete(removed_contact)
                 
                 if self.language == 'zh':
-                    await conversation.say(f'{removed_contact.name()}已被移出群聊')
+                    await conversation.say(f'{removed_contact.name}已被移出群聊')
                 else:
-                    await conversation.say(f'{removed_contact.name()} is removed from chat')
+                    await conversation.say(f'{removed_contact.name} is removed from chat')
         print(msg.__dict__)
 
     async def my_self(self) -> Contact:

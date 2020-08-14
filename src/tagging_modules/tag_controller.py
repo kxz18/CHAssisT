@@ -75,7 +75,7 @@ class TagController:
             try:
                 expiry = parse(date_str)
             except ParserError:   # here help doc may be needed
-                self.reply = reply.parse_expiry_error()
+                self.reply = reply.parse_datetime_error()
                 return True
         else:    # no expiry
             content = msg
