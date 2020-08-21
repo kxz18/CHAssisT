@@ -30,4 +30,4 @@ def split_mention(text):
     res = pattern.match(text)
     if res is None:
         return (text, None)
-    return (res.group(1), res.group(2))
+    return (res.group(1), res.group(2).strip())
