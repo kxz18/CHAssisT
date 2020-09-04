@@ -74,7 +74,8 @@ pytest:
 test-unit: pytest
 
 .PHONY: test
-test: check-version lint pytest
+# test: check-version lint pytest
+test: lint pytest
 
 #.PHONY: check-version
 #check-version:
