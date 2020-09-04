@@ -1,1 +1,6 @@
-wechaty~=0.4.14
+APScheduler==3.6.3
+langdetect==1.0.8
+python-dateutil==2.8.1
+wechaty==0.6.10
+wechaty-puppet==0.0.16
+wechaty-puppet-hostie==0.2.12

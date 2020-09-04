@@ -1,0 +1,15 @@
+APScheduler==3.6.3
+flake8==3.8.3
+langdetect==1.0.8
+mypy==0.782
+mypy-extensions==0.4.3
+pycodestyle==2.6.0
+pyee==7.0.2
+pylint==2.5.3
+pylint-quotes==0.2.1
+pytest==3.2.2
+python-dateutil==2.8.1
+pytype==2020.6.26
+wechaty==0.6.10
+wechaty-puppet==0.0.16
+wechaty-puppet-hostie==0.2.12
