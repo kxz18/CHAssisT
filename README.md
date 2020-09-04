@@ -67,3 +67,4 @@ To use the bot in a group chat, say something and @bot to let it know you are ta
 - member manager
   - The bot will welcome newly joined members
   - The bot will remove some unwelcome chatting members with a voting mechanism.
+
