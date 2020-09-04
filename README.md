@@ -1,4 +1,6 @@
-# python-wechaty 群聊助手机器人[![Python 3.7](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/release/python-370/)
+# CHAssisT[![Python 3.7](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/release/python-370/)
+
+> A chat assistant bot based on python-wechaty
 
 <img src="./images/logo.png" alt="logo" style="zoom:100%;"/> 
 
@@ -19,8 +21,8 @@ Wechaty is a RPA SDK for Wechat **Individual** Account that can help you create 
 1. Clone this repository
 
    ```shell
-   git clone https://github.com/kxz18/python-wechaty-groupchat-bot
-   cd python-wechaty-groupchat-bot
+   git clone https://github.com/kxz18/CHAssisT
+   cd CHAssisT
    ```
 
 2. Install Dependencies
@@ -45,7 +47,7 @@ Wechaty is a RPA SDK for Wechat **Individual** Account that can help you create 
    ```shell
    make bot
    # or
-   python examples/ding-dong-bot.py
+   python examples/example.py
    ```
 
 ## Functions
@@ -67,4 +69,3 @@ To use the bot in a group chat, say something and @bot to let it know you are ta
 - member manager
   - The bot will welcome newly joined members
   - The bot will remove some unwelcome chatting members with a voting mechanism.
-
