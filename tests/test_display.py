@@ -43,3 +43,5 @@ def test_display_msg():
                               f'{start.year}.{start.month}.{start.day}'
                               f'-{end.year}.{end.month}.{end.day}', True)
     assert len(display.reply.split('\n')) == len(MSG_CONTENTS)
+    assert display.handle_msg(f'{KEY_DISPLAY}{KEY_SPLIT}aaaa-aaaaa', True)
+    assert display.reply == reply.parse_datetime_error()
