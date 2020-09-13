@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding:utf-8 -*-
 """replies of events"""
+from utils.date_to_str import cron_dict_to_str
 
 
 # TagController
@@ -27,21 +28,22 @@ def set_timed_delete_success(params, delta):
     params:
         params: dictionary of time parameters of the job
         delta: messages that are 'delta' days before will be deleted"""
-    time_point = ''
-    for key in params:
-        if params[key] != '*':
-            if key == 'week day':
-                time_point += f'{key} {params[key]}'
-            else:
-                time_point += f'{params[key]} {key}'
-    time_point = time_point.replace('year', '年')\
-                           .replace('month', '月')\
-                           .replace('day', '日')\
-                           .replace('week day', '星期')\
-                           .replace('hour', '时')\
-                           .replace('minute', '分')\
-                           .replace(' ', '')
-    return f'{delta}天前的消息将会在每个以下时间点被删除: {time_point}'
+    # time_point = ''
+    # for key in params:
+    #     if params[key] != '*':
+    #         if key == 'week day':
+    #             time_point += f'{key} {params[key]}'
+    #         else:
+    #             time_point += f'{params[key]} {key}'
+    # time_point = time_point.replace('year', '年')\
+    #                        .replace('month', '月')\
+    #                        .replace('day', '日')\
+    #                        .replace('week day', '星期')\
+    #                        .replace('hour', '时')\
+    #                        .replace('minute', '分')\
+    #                        .replace(' ', '')
+    time_point = cron_dict_to_str(params, 'zh')
+    return f'{delta}天前的消息将会在以下时间点被删除: {time_point}'
     # return f'messages that are {delta} days before will be deleted on every {time_point}'
 
 
@@ -80,7 +82,7 @@ def is_question(text):
 def question_signals():
     """return signals indicating this is a question"""
     return ['？', '?', '么', '嘛', '吗', '呢', '啊', '什么', '怎么', '如何', '哪', '为什么',
-            '几', '谁', '多少', '啥']
+            '几', '谁', '多少', '啥', '吧']
 
 
 # display
