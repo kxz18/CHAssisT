@@ -30,15 +30,15 @@ def cron_dict_to_str(params, language):
         elif key != 'week day':
             time_point += f'every {key}'
     if language == 'zh':
+        weekdays = ['日', '一', '二', '三', '四', '五', '六']
+        for idx, weekday in enumerate(weekdays):
+            time_point = time_point.replace(f'week day {idx}',
+                                            f'星期{weekday}')
         time_point = time_point\
             .replace('month', '月')\
             .replace('day', '日')\
             .replace('hour', '时')\
             .replace('minute', '分')\
             .replace('every', '每')
-        weekdays = ['日', '一', '二', '三', '四', '五', '六']
-        for idx, weekday in enumerate(weekdays):
-            time_point = time_point.replace(f'week day {idx}',
-                                            f'星期{weekday}')
         time_point = time_point.replace(' ', '')
     return time_point
