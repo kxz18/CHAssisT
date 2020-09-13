@@ -7,6 +7,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from wechaty import Contact
 from wechaty.user import Room
 from timed_task_modules import reply
+from utils.date import parse_cron_str_to_dict
 
 KEY_TIMED_TASK = '定时消息'
 # KEY_TIMED_TASK = 'timed message'
@@ -71,19 +72,20 @@ class TaskController:
     def cron_type_task(self, msg: str, conversation: Union[Contact, Room]):
         """parse cron type timed task
         pattern is like 'timed message#y-m-d-dof-h-min-msg"""
-        pattern = re.compile(r'^\s*' + KEY_TIMED_TASK + r'\s*' + KEY_SPLIT
-                             + r'\s*' + '-'.join([r'(\d+|\*)' for _ in range(5)])
+        pattern = re.compile(r'^\s*' + KEY_TIMED_TASK + r'\s*' + KEY_SPLIT + r'\s*'
+                             + '(' + '-'.join([r'(?:\d+|\*)' for _ in range(5)]) + ')'
                              + '-' + r'(.*?)$')
         res = pattern.match(msg)
         if res is None:
             return False
-        params = {}
-        for idx, key in enumerate(['month', 'day', 'week day', 'hour', 'minute']):
-            params[key] = res.group(idx + 1)
+        # params = {}
+        # for idx, key in enumerate(['month', 'day', 'week day', 'hour', 'minute']):
+        #     params[key] = res.group(idx + 1)
+        params = parse_cron_str_to_dict(res.group(1), '-')
         self.id_count += 1
         self.scheduler.add_job(conversation.say, 'cron', month=params['month'],
                                day=params['day'], day_of_week=params['week day'],
                                hour=params['hour'], minute=params['minute'],
-                               args=[res.group(6)], id=str(self.id_count))
-        self.reply = reply.set_cron_timed_task_success(params, res.group(6))
+                               args=[res.group(2)], id=str(self.id_count))
+        self.reply = reply.set_cron_timed_task_success(params, res.group(2))
         return True

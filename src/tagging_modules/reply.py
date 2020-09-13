@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding:utf-8 -*-
 """replies of events"""
-from utils.date_to_str import cron_dict_to_str
+from utils.date import cron_dict_to_str
 
 
 # TagController
