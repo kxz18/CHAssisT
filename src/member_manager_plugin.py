@@ -50,7 +50,8 @@ class MemberManager(WechatyPlugin):
             if not to_bot:
                 return
             if self.language == 'zh':
-                await conversation.say('成员管理功能必须在群聊中使用')
+                # await conversation.say('成员管理功能必须在群聊中使用')
+                pass
             else:
                 await conversation.say('Not work if not in chat room')
             return
