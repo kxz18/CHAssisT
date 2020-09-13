@@ -41,7 +41,7 @@ def set_timed_delete_success(params, delta):
                            .replace('hour', '时')\
                            .replace('minute', '分')\
                            .replace(' ', '')
-    return f'{delta}天前的消息将会在每个{time_point}被删除'
+    return f'{delta}天前的消息将会在每个以下时间点被删除: {time_point}'
     # return f'messages that are {delta} days before will be deleted on every {time_point}'
 
 
