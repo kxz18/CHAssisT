@@ -16,10 +16,10 @@ groupchat_bot_help_en = {
               'Id can be obtained by displaying messages',
     'timed-delete': 'To set timed task for deleting tagged messages, say to the bot like:\n'
                     f'{tag_controller.KEY_DELETE}{tag_controller.KEY_SPLIT}'
-                    'year-month-day-day of week-hour-minute-x, '
+                    'month-day-day of week-hour-minute-x, '
                     'where messages that are x days before will be deleted and * means "every".'
                     f'e.g. {tag_controller.KEY_DELETE}{tag_controller.KEY_SPLIT}'
-                    '*-*-*-*-22-0-1 means delete messages 1 days before on 22:00 daily.\n'
+                    '*-*-*-22-0-1 means delete messages 1 days before on 22:00 daily.\n'
                     'To stop it, say to the bot like:\n'
                     f'{tag_controller.KEY_DELETE}{tag_controller.KEY_SPLIT}'
                     f'{tag_controller.KEY_STOP}',
@@ -34,10 +34,10 @@ groupchat_bot_help_en = {
     'question': 'To ask for saved messages, just ask the bot what you want to know',
     'timed-task': 'To set timed task for send messages, say to the bot like:\n'
                   f'{task_controller.KEY_TIMED_TASK}{task_controller.KEY_SPLIT}'
-                  'year-month-day-day of week-hour-minute-x, '
+                  'month-day-day of week-hour-minute-x, '
                   'where x will be sent and * means "every".'
                   f'e.g. {task_controller.KEY_TIMED_TASK}{task_controller.KEY_SPLIT}'
-                  '*-*-*-*-22-0-1 means sending \'1\' on 22:00 daily.\n'
+                  '*-*-*-22-0-1 means sending \'1\' on 22:00 daily.\n'
                   'You can also use date format like year-month-day hour-minute-second '
                   'to set unperiodic message'
 }
@@ -54,10 +54,10 @@ groupchat_bot_help_zh = {
               '消息id可通过浏览打标消息获得。',
     '定时删除打标消息': '如果您想定时删除一些消息，只需要对我说：\n\n'
                 f'{tag_controller.KEY_DELETE}{tag_controller.KEY_SPLIT}'
-                '年-月-日-星期(从1到7)-小时-分钟-x\n\n'
+                '月-日-星期(从1到7)-小时-分钟-x\n\n'
                 'x 天之前的消息会被删除，填入*表示每个时间点都会执行。'
                 f'例如"{tag_controller.KEY_DELETE}{tag_controller.KEY_SPLIT}'
-                '*-*-*-*-22-0-1"表示每天22:00时删除一天前的消息。\n'
+                '*-*-*-22-0-1"表示每天22:00时删除一天前的消息。\n'
                 '如果您想停止自动删除功能，只需对我说：\n\n'
                 f'{tag_controller.KEY_DELETE}{tag_controller.KEY_SPLIT}'
                 f'{tag_controller.KEY_STOP}',
@@ -72,9 +72,9 @@ groupchat_bot_help_zh = {
     '提问': '如果想从历史消息中获取一些信息，只需要直接问我你的问题即可',
     '定时消息': '如果您想设定定时发送的消息，有两种可供选择的命令格式：\n\n'
             f'{task_controller.KEY_TIMED_TASK}{task_controller.KEY_SPLIT}'
-            '年-月-日-星期-小时-分钟-消息内容。\n\n其中填入"*"表示任意时间点。\n'
+            '月-日-星期-小时-分钟-消息内容。\n\n其中填入"*"表示任意时间点。\n'
             f'例如"{task_controller.KEY_TIMED_TASK}{task_controller.KEY_SPLIT}'
-            '*-*-*-*-22-0-1"表示每天22:00发送消息"1"\n'
+            '*-*-*-22-0-1"表示每天22:00发送消息"1"\n'
             f'另一种格式是：\n\n{task_controller.KEY_TIMED_TASK}'
             f'{task_controller.KEY_SPLIT}年-月-日 小时:分钟:秒-消息内容\n\n'
             '这种格式是指定时间点发送，而前一种是周期性地发送'
