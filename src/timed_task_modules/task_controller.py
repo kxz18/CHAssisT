@@ -72,20 +72,18 @@ class TaskController:
         """parse cron type timed task
         pattern is like 'timed message#y-m-d-dof-h-min-msg"""
         pattern = re.compile(r'^\s*' + KEY_TIMED_TASK + r'\s*' + KEY_SPLIT
-                             + r'\s*' + '-'.join([r'(\d+|\*)' for _ in range(6)])
+                             + r'\s*' + '-'.join([r'(\d+|\*)' for _ in range(5)])
                              + '-' + r'(.*?)$')
         res = pattern.match(msg)
         if res is None:
             return False
         params = {}
-        for idx, key in enumerate(['year', 'month', 'day', 'week day', 'hour', 'minute']):
+        for idx, key in enumerate(['month', 'day', 'week day', 'hour', 'minute']):
             params[key] = res.group(idx + 1)
         self.id_count += 1
-        self.scheduler.add_job(conversation.say, 'cron',
-                               year=params['year'], month=params['month'],
+        self.scheduler.add_job(conversation.say, 'cron', month=params['month'],
                                day=params['day'], day_of_week=params['week day'],
                                hour=params['hour'], minute=params['minute'],
-                               args=[res.group(7)],
-                               id=str(self.id_count))
-        self.reply = reply.set_cron_timed_task_success(params, res.group(7))
+                               args=[res.group(6)], id=str(self.id_count))
+        self.reply = reply.set_cron_timed_task_success(params, res.group(6))
         return True

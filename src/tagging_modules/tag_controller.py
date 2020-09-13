@@ -107,7 +107,7 @@ class TagController:
         # pattern is like 'delete#y-m-d-dof-h-min-x'
         # data which are x days before will be deleted
         pattern = re.compile(r'^' + KEY_DELETE + KEY_SPLIT
-                             + '-'.join([r'(\d+|\*)' for _ in range(7)]))
+                             + '-'.join([r'(\d+|\*)' for _ in range(6)]))
         res = pattern.match(re.sub(r'\s+', '', msg))
         if res is None:
             return False
@@ -115,15 +115,15 @@ class TagController:
         if self.job_id in ids:   # remove former job
             self.scheduler.remove_job(self.job_id)
         params = {}
-        for idx, key in enumerate(['year', 'month', 'day', 'week day', 'hour', 'minute']):
+        for idx, key in enumerate(['month', 'day', 'week day', 'hour', 'minute']):
             params[key] = res.group(idx + 1)
         self.scheduler.add_job(self.interface.del_msg_by_timedelta, 'cron',
-                               year=params['year'], month=params['month'],
+                               month=params['month'],
                                day=params['day'], day_of_week=params['week day'],
                                hour=params['hour'], minute=params['minute'],
-                               args=[timedelta(days=int(res.group(7)))],
+                               args=[timedelta(days=int(res.group(6)))],
                                id=self.job_id)
-        self.reply = reply.set_timed_delete_success(params, int(res.group(7)))
+        self.reply = reply.set_timed_delete_success(params, int(res.group(6)))
         return True
 
     def handle_stop_timed_delete(self, msg: str):
