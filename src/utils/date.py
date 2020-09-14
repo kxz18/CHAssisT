@@ -9,10 +9,17 @@ def parse_cron_str_to_dict(cron_str, split):
     month, day, week day, hour, minute"""
     cron_dict = {}
     keys = ['month', 'day', 'week day', 'hour', 'minute']
-    for key, content in zip(keys, cron_str.split(split)):
-        cron_dict[key] = content if content == '*' else int(content)
-    if cron_dict['week day'] == 7:
-        cron_dict['week day'] = 0
+    cron_list = cron_str.split(split)
+    if len(cron_list) != 5:
+        raise ValueError('wrong format')
+    for key, content in zip(keys, cron_list):
+        if content == '*':
+            cron_dict[key] = content
+        elif content.isdigit():
+            content = int(content) - 1 if key == 'week day' else int(content)
+            cron_dict[key] = content
+        else:
+            raise ValueError('unrecognized value')
     return cron_dict
 
 
@@ -30,7 +37,7 @@ def cron_dict_to_str(params, language):
         elif key != 'week day':
             time_point += f'every {key}'
     if language == 'zh':
-        weekdays = ['日', '一', '二', '三', '四', '五', '六']
+        weekdays = ['一', '二', '三', '四', '五', '六', '日']
         for idx, weekday in enumerate(weekdays):
             time_point = time_point.replace(f'week day {idx}',
                                             f'星期{weekday}')

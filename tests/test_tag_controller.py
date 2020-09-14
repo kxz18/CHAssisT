@@ -71,6 +71,14 @@ def test_timed_delete():
                                     talker='me', to_bot=True)
     assert ifreply
 
+def test_wrong_cron_format():
+    """test timed delete with wrong format"""
+    controller = TagController(DataTransfer(Database(PATH)))
+    ifreply = controller.handle_msg(quoted=None, msg=f'{KEY_DELETE} {KEY_SPLIT}*-*-0-0-0-1',
+                                    talker='me', to_bot=True)
+    assert ifreply
+    assert controller.reply == reply.parse_datetime_error()
+
 def test_stop_timed_delete():
     """test stop timed delete task"""
     controller = TagController(DataTransfer(Database(PATH)))

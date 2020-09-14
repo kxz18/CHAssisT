@@ -78,14 +78,14 @@ class TaskController:
         res = pattern.match(msg)
         if res is None:
             return False
-        # params = {}
-        # for idx, key in enumerate(['month', 'day', 'week day', 'hour', 'minute']):
-        #     params[key] = res.group(idx + 1)
-        params = parse_cron_str_to_dict(res.group(1), '-')
-        self.id_count += 1
-        self.scheduler.add_job(conversation.say, 'cron', month=params['month'],
-                               day=params['day'], day_of_week=params['week day'],
-                               hour=params['hour'], minute=params['minute'],
-                               args=[res.group(2)], id=str(self.id_count))
-        self.reply = reply.set_cron_timed_task_success(params, res.group(2))
+        try:
+            params = parse_cron_str_to_dict(res.group(1), '-')
+            self.id_count += 1
+            self.scheduler.add_job(conversation.say, 'cron', month=params['month'],
+                                   day=params['day'], day_of_week=params['week day'],
+                                   hour=params['hour'], minute=params['minute'],
+                                   args=[res.group(2)], id=str(self.id_count))
+            self.reply = reply.set_cron_timed_task_success(params, res.group(2))
+        except ValueError:
+            self.reply = reply.parse_datetime_error()
         return True
