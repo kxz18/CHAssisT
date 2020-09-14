@@ -36,3 +36,9 @@ def set_date_timed_task_success(date, message):
         message: message to be sent"""
     return f'"{message}"将在{date}被发出'
     # return f'message {message} will be sent on {date}'
+
+
+def parse_datetime_error():
+    """given date with wrong format"""
+    return '日期的格式好像不太对，可以参考下帮助文档'
+    # return 'date-time format error, consult the help doc for format'

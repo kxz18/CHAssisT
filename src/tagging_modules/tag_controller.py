@@ -119,14 +119,17 @@ class TagController:
         # params = {}
         # for idx, key in enumerate(['month', 'day', 'week day', 'hour', 'minute']):
         #     params[key] = res.group(idx + 1)
-        params = parse_cron_str_to_dict(res.group(1), '-')
-        self.scheduler.add_job(self.interface.del_msg_by_timedelta, 'cron',
-                               month=params['month'],
-                               day=params['day'], day_of_week=params['week day'],
-                               hour=params['hour'], minute=params['minute'],
-                               args=[timedelta(days=int(res.group(2)))],
-                               id=self.job_id)
-        self.reply = reply.set_timed_delete_success(params, int(res.group(2)))
+        try:
+            params = parse_cron_str_to_dict(res.group(1), '-')
+            self.scheduler.add_job(self.interface.del_msg_by_timedelta, 'cron',
+                                   month=params['month'],
+                                   day=params['day'], day_of_week=params['week day'],
+                                   hour=params['hour'], minute=params['minute'],
+                                   args=[timedelta(days=int(res.group(2)))],
+                                   id=self.job_id)
+            self.reply = reply.set_timed_delete_success(params, int(res.group(2)))
+        except ValueError:
+            self.reply = reply.parse_datetime_error()
         return True
 
     def handle_stop_timed_delete(self, msg: str):
