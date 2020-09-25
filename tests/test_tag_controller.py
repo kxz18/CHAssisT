@@ -63,18 +63,26 @@ def test_delete():
 def test_timed_delete():
     """test timed delete"""
     controller = TagController(DataTransfer(Database(PATH)))
-    ifreply = controller.handle_msg(quoted=None, msg=f'{KEY_DELETE} {KEY_SPLIT}*-*-*-2-0-0-1',
+    ifreply = controller.handle_msg(quoted=None, msg=f'{KEY_DELETE} {KEY_SPLIT}*-*-2-0-0-1',
                                     talker='me', to_bot=True)
     assert ifreply
     # substitute former plan
-    ifreply = controller.handle_msg(quoted=None, msg=f'{KEY_DELETE} {KEY_SPLIT}*-*-*-*-*-*-1',
+    ifreply = controller.handle_msg(quoted=None, msg=f'{KEY_DELETE} {KEY_SPLIT}*-*-*-*-*-1',
                                     talker='me', to_bot=True)
     assert ifreply
+
+def test_wrong_cron_format():
+    """test timed delete with wrong format"""
+    controller = TagController(DataTransfer(Database(PATH)))
+    ifreply = controller.handle_msg(quoted=None, msg=f'{KEY_DELETE} {KEY_SPLIT}*-*-0-0-0-1',
+                                    talker='me', to_bot=True)
+    assert ifreply
+    assert controller.reply == reply.parse_datetime_error()
 
 def test_stop_timed_delete():
     """test stop timed delete task"""
     controller = TagController(DataTransfer(Database(PATH)))
-    controller.handle_msg(quoted=None, msg=f'{KEY_DELETE} {KEY_SPLIT}*-*-*-2-0-0-1',
+    controller.handle_msg(quoted=None, msg=f'{KEY_DELETE} {KEY_SPLIT}*-*-2-0-0-1',
                           talker='me', to_bot=True)
     ifreply = controller.handle_msg(quoted=None, msg=f'{KEY_DELETE}{KEY_SPLIT}{KEY_STOP}',
                                     talker='me', to_bot=True)

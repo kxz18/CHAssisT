@@ -38,7 +38,7 @@ def test_cron_pattern():
     async def task():
         controller = TaskController()
         command = KEY_TIMED_TASK + KEY_SPLIT\
-                  + '2019-7-3-*-22-13-test message'
+                  + '7-3-*-22-13-test message'
         contact = FakeContact()
         assert controller.handle_msg(command, contact, True)
 

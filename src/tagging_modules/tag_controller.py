@@ -10,6 +10,7 @@ from data.data_transfer import DataTransfer
 from data.msg_with_tag import MsgWithTag
 from tagging_modules.question_answering import QuestionAnswering
 from tagging_modules import reply
+from utils.date import parse_cron_str_to_dict
 
 KEY_EXPIRY = '有效期'
 KEY_DELETE = '删除'
@@ -106,24 +107,29 @@ class TagController:
         """generate timed deleting task"""
         # pattern is like 'delete#y-m-d-dof-h-min-x'
         # data which are x days before will be deleted
-        pattern = re.compile(r'^' + KEY_DELETE + KEY_SPLIT
-                             + '-'.join([r'(\d+|\*)' for _ in range(7)]))
+        pattern = re.compile(r'^' + KEY_DELETE + KEY_SPLIT + '('
+                             + '-'.join([r'(?:\d+|\*)' for _ in range(5)])
+                             + ')' + '-' + r'(\d+)')
         res = pattern.match(re.sub(r'\s+', '', msg))
         if res is None:
             return False
         ids = [job.id for job in self.scheduler.get_jobs()]
         if self.job_id in ids:   # remove former job
             self.scheduler.remove_job(self.job_id)
-        params = {}
-        for idx, key in enumerate(['year', 'month', 'day', 'week day', 'hour', 'minute']):
-            params[key] = res.group(idx + 1)
-        self.scheduler.add_job(self.interface.del_msg_by_timedelta, 'cron',
-                               year=params['year'], month=params['month'],
-                               day=params['day'], day_of_week=params['week day'],
-                               hour=params['hour'], minute=params['minute'],
-                               args=[timedelta(days=int(res.group(7)))],
-                               id=self.job_id)
-        self.reply = reply.set_timed_delete_success(params, int(res.group(7)))
+        # params = {}
+        # for idx, key in enumerate(['month', 'day', 'week day', 'hour', 'minute']):
+        #     params[key] = res.group(idx + 1)
+        try:
+            params = parse_cron_str_to_dict(res.group(1), '-')
+            self.scheduler.add_job(self.interface.del_msg_by_timedelta, 'cron',
+                                   month=params['month'],
+                                   day=params['day'], day_of_week=params['week day'],
+                                   hour=params['hour'], minute=params['minute'],
+                                   args=[timedelta(days=int(res.group(2)))],
+                                   id=self.job_id)
+            self.reply = reply.set_timed_delete_success(params, int(res.group(2)))
+        except ValueError:
+            self.reply = reply.parse_datetime_error()
         return True
 
     def handle_stop_timed_delete(self, msg: str):
