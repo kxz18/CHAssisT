@@ -4,7 +4,7 @@
 
 <img src="./images/logo.png" alt="logo" style="zoom:100%;"/> 
 
-## Usage
+## :rocket: Usage
 
 ### Connecting Chatbots
 
@@ -15,6 +15,10 @@ Wechaty is a RPA SDK for Wechat **Individual** Account that can help you create 
 ### Requirements
 
 1. python3.7+
+2. APScheduler3.6.3+
+3. wechaty0.6.10+
+4. langdetect1.0.8+
+5. python-dateutil2.8.1+
 
 ### Quick Start
 
@@ -50,7 +54,7 @@ Wechaty is a RPA SDK for Wechat **Individual** Account that can help you create 
    python examples/example.py
    ```
 
-## Functions
+## :triangular_flag_on_post: Functions
 
 To use the bot in a group chat, say something and @bot to let it know you are talking to it. To use the bot in private chat, just talk to it.
 
@@ -69,3 +73,60 @@ To use the bot in a group chat, say something and @bot to let it know you are ta
 - member manager
   - The bot will welcome newly joined members
   - The bot will remove some unwelcome chatting members with a voting mechanism.
+
+## :guitar: API
+
+### 1 Class `GroupchatAssistant`
+
+Main plugin class, can be integrated into a Wechaty bot with a `use` command:
+
+```python
+bot.use(GroupchatAssist())	# bot is a instance of Wechaty 
+```
+
+| GroupchatAssistant | API  | Description |
+| :-- | :-- | :-- |
+| property | name( ): string | name of this plugin |
+| method | GroupchatAssistant(data_path: string, config_path: string) | constructor of this plugin. Data_path specifies storage path of saved data. Config_path specifies path of configuration file of database (No need to modify in most cases). |
+
+### 2 Class `HelpSystem`
+
+Plugin of helping messages. User-defined help documentary is supported.
+
+| HelpSystem | API                                                          | Description                                                  |
+| :--------- | :----------------------------------------------------------- | :----------------------------------------------------------- |
+| property   | name( ): string                                              | name of this plugin                                          |
+| method     | HelpSystem(key_help: string, key_split: string, help_dict: dict) | constructor of this plugin. Message to get help is in the format like <key_help><key_split><function_name>. User-defined help documentary should be a dict with function name as key and help message as value. |
+
+### 3 Class `Tagging`
+
+Plugin of tagging and question-answering system.
+
+| Tagging  | API                                             | Description                                                  |
+| :------- | ----------------------------------------------- | ------------------------------------------------------------ |
+| property | name( ): string                                 | name of this plugin                                          |
+| method   | Tagging(data_path: string, config_path: string) | constructor of this plugin. Parameters are the same as class GroupchatAssistant. |
+
+### 4 Class `TimedTask`
+
+Plugin of timed-task.
+
+| TimedTask | API             | Description                |
+| --------- | --------------- | -------------------------- |
+| property  | name( ): string | name of this plugin        |
+| method    | TimedTask( )    | constructor of this plugin |
+
+### 5 Class `MemberManager`
+
+Plugin of member management.
+
+| MemberManager | API                             | Description                                              |
+| ------------- | ------------------------------- | -------------------------------------------------------- |
+| property      | name( ): string                 | name of this plugin                                      |
+| method        | MemberManager(language: string) | constructor of this plugin. `language` specifies locale. |
+
+## See Also
+
+- [python-wechaty](https://github.com/wechaty/python-wechaty)
+- [wechaty](https://github.com/wechaty/wechaty)
+
