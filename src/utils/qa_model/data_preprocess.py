@@ -52,9 +52,9 @@ def split_set(path, target1, target2, ratio, shuffle=True):
         fout.writelines(set2)
 
 
-def main():
+def main(prefix_path):
     """main entry"""
-    prefix_path = './baike/'
+    prefix_path = prefix_path.rstrip('/') + '/'
     raw_train = 'baike_qa_train.json'
     raw_valid = 'baike_qa_valid.json'
     processed_train = 'baike_qa_train_processed.json'
@@ -71,4 +71,4 @@ def main():
         print(f'finish preprocess {target}')
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1])

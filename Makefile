@@ -99,6 +99,15 @@ publish:
 bot:
 	python3 examples/example.py
 
+.PHONY: train
+train:
+	# python3 src/utils/qa_model/train.py 'src/utils/qa_model/baike'
+	python3 src/utils/qa_model/train.py 'src/utils/qa_model/insuranceqa'
+
+.PHONY: test_model
+test_model:
+	python3 src/utils/qa_model/similarity.py
+
 #.PHONY: version
 #version:
 #	@newVersion=$$(awk -F. '{print $$1"."$$2"."$$3+1}' < VERSION) \

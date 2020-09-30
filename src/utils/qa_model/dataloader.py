@@ -28,7 +28,8 @@ class Vocab:
         self.idx_to_word = []
     
     @classmethod
-    def get_vocab(self, lines, vocab_path, max_size=-1, tokenizer=lambda x: x.split(), nohup=False):
+    def get_vocab(self, lines, vocab_path, max_size=-1,
+            tokenizer=lambda x: re.split(r'\s+', x), nohup=False):
         try:
             if not nohup:
                 flush_print(f'trying to load vocabulary from {vocab_path}')
@@ -67,8 +68,8 @@ class WordEmbeddingDataset(tud.Dataset):
         self.answers_encoded = []
         self.answers_lens = []
         for question, answer in zip(questions, answers):
-            question = question.split()
-            answer = answer.split()
+            question = re.split(r'\s+', question)
+            answer = re.split(r'\s+', answer)
             if len(question) <= 0 or len(answer) <= 0:
                 continue
             
@@ -152,13 +153,14 @@ class DataLoader:
         if not self.nohup:
             flush_print(f'vocabulary generated, elapsed: {time.time()-time_start} s')
             flush_print('creating dataset ...')
+        time_start = time.time()
         dataset = WordEmbeddingDataset(questions, answers, self.word_to_idx,\
                 self.idx_to_word, self.seq_len_q, self.seq_len_a, self.fake_answer_num)
         self.dataloader = tud.DataLoader(dataset, batch_size=batch_size,\
                      shuffle=shuffle, num_workers=num_workers)
         self.batches = iter(self.dataloader)
         if not self.nohup:
-            flush_print('batches loaded')
+            flush_print(f'batches loaded, elapsed: {time.time() - time_start} s')
 
     def batch_iter(self):
         return iter(self.dataloader)
@@ -186,3 +188,7 @@ class DataLoader:
         return batch num
         '''
         return len(self.dataloader)
+
+    def data_num(self):
+        """return number of data"""
+        return self.dataloader.dataset.__len__()

@@ -7,6 +7,7 @@ from enum import Enum, unique
 
 from data.data_transfer import DataTransfer
 from tagging_modules import reply
+from utils.similarity_algorithm import deep_learning_similarity
 from utils.similarity_algorithm import frequency_cosine_similarity
 
 
@@ -21,7 +22,7 @@ class Confidence(Enum):
 class QuestionAnswering:
     """class of QA"""
     def __init__(self, interface: DataTransfer,
-                 similarity=frequency_cosine_similarity):
+                 similarity=deep_learning_similarity):
         """params:
         interface: interface of database of all tagged messages
         similarity: algorithm of calculating similarity"""
